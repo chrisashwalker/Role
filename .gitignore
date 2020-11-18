@@ -1,0 +1,14 @@
+.vscode/
+obj/
+Library/
+Logs/
+Packages/
+ProjectSettings/
+Temp/
+UIElementsSchema/
+*.csproj
+*.log
+*.sln
+Assets/*
+!Assets/Scripts/
+*.meta
