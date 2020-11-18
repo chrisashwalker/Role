@@ -41,6 +41,10 @@ public class Character{
     public int Stamina{
         get;set;
     }
+
+    public char Direction{
+        get;set;
+    }
     
     public Character(string setName = "", float setSpeed = 1.0f, int setMaxHealth = 1, int setMaxStamina = 1, int setStrength = 1){
         Name = setName;
@@ -51,6 +55,7 @@ public class Character{
         Health = MaxHealth;
         Stamina = MaxStamina;
         Tags = new List<TagList>();
+        Direction = 'D';
     }
 
     public string say(string phrase){ // TODO: Use this

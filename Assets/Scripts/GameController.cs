@@ -38,8 +38,8 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
 
     public Texture2D ProjectileTexture; // Texture assigned via Unity object settings
     private Projectile ShotProjectile;
-    //private GameObject ShotProjectileObject;
-    //private Vector3 ShotProjectileStart;
+    private GameObject ShotProjectileObject;
+    private Vector3 ShotProjectileStart;
 
     private int farthestScene; // Represents how far the player has travelled
     private int currentScene;
@@ -48,7 +48,7 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
 
     // Key controls, excluding movement inputs
     private KeyCode MapZoom = KeyCode.V;
-    //private KeyCode Interact = KeyCode.E;
+    private KeyCode Interact = KeyCode.E;
     private KeyCode ScrollLeft = KeyCode.Comma;
     private KeyCode ScrollRight = KeyCode.Period;
     private KeyCode UseItem = KeyCode.Slash;
@@ -127,22 +127,30 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
         }
     }
 
-/*     void ShootProjectile(Character shooter){
+    void ShootProjectile(Character shooter){
         ShotProjectile = (Projectile) Backpack.StoredItems[Backpack.EquippedItemIndex];
         ShotProjectileObject = new GameObject("ShotProjectile");
         SpriteRenderer ShotProjectileSpriteRenderer = ShotProjectileObject.AddComponent<SpriteRenderer>();
         Rigidbody ShotProjectileRigidbody = ShotProjectileObject.AddComponent<Rigidbody>();
-        ShotProjectileRigidbody.gravityScale = 0;
+        ShotProjectileRigidbody.useGravity = false;
         Sprite ShotProjectileSprite = Sprite.Create(ProjectileTexture, new Rect(0, 0, 128.0f, 128.0f), new Vector2(0.5f, 0.5f), 256.0f);
         ShotProjectileSpriteRenderer.sprite = ShotProjectileSprite;
         ShotProjectileSpriteRenderer.sortingLayerName = "Player";
         int projectileShiftX = 0, projectileShiftY = 0, projectileShiftZ = 0;
         float projectileVelocityX = 0.0f, projectileVelocityY = 0.0f, projectileVelocityZ = 0.0f;
-        projectileVelocityZ = 3.0f;
+        if (Player.Direction == 'D'){
+            projectileVelocityZ = -24.0f;
+        } else if (Player.Direction == 'U'){
+            projectileVelocityZ = 24.0f;
+        } else if (Player.Direction == 'L'){
+            projectileVelocityX = -24.0f;
+        } else if (Player.Direction == 'R'){
+            projectileVelocityX = 24.0f;
+        }
         ShotProjectileObject.transform.position = new Vector3(shooter.Rigidbody.position.x + projectileShiftX, shooter.Rigidbody.position.y + projectileShiftY, shooter.Rigidbody.position.z + projectileShiftZ);
         ShotProjectileRigidbody.velocity = new Vector3(projectileVelocityX, projectileVelocityY, projectileVelocityZ);
         ShotProjectileStart = ShotProjectileObject.transform.position;            
-    } */
+    }
 
     /* void UseTool(Character worker){
         Tool UsedTool = (Tool) Backpack.StoredItems[Backpack.EquippedItemIndex];
@@ -226,7 +234,7 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
             Debug.Log(Backpack.StoredItems[Backpack.EquippedItemIndex].Name + " was used");
 
             if (Backpack.StoredItems[Backpack.EquippedItemIndex].Type.Equals(ItemTypes.PROJECTILE) && ShotProjectile == null){
-                //ShootProjectile(Player);
+                ShootProjectile(Player);
             } else if (Backpack.StoredItems[Backpack.EquippedItemIndex].Type.Equals(ItemTypes.TOOL)){
                 //UseTool(Player);   
             }
@@ -236,7 +244,7 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
 
     void BuildScenes(){
         SceneList.Add(1, "1_home");
-        // SceneList.Add(2, "2_field");
+        SceneList.Add(2, "2_field");
     }
 
     void FindCharacters(){
@@ -279,6 +287,15 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
 
     void MoveCharacter(Character character){
         character.Rigidbody.velocity = new Vector3(Input.GetAxis("Horizontal") * 10,0,Input.GetAxis("Vertical") * 20);
+        if (character.Rigidbody.velocity.z > 0){
+            character.Direction = 'U';
+        } else if (character.Rigidbody.velocity.z < 0){
+            character.Direction = 'D';
+        } else if (character.Rigidbody.velocity.x > 0){
+            character.Direction = 'R';
+        } else if (character.Rigidbody.velocity.x < 0){
+            character.Direction = 'L';
+        }
     }
 
     void MapToggle(){ // Effectively zooms out to grant an overview of the surrounding area
@@ -343,52 +360,54 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
         }
     }
 
-/*     GameObject CollisionCheck(){
+    GameObject onCollisionStay(Collision collision){
         GameObject result = null;
-        foreach (Gate gate in GateList){
-            if (gate.Collider.IsTouching(Player.Collider) && Input.GetKey(Interact)){
-                Debug.Log("Interaction triggered with Gate");
-                currentScene = gate.Destination;
-                if (farthestScene < gate.Destination){
-                    farthestScene = gate.Destination;
-                }
-                SceneManager.LoadScene(SceneList[gate.Destination], LoadSceneMode.Single);
-                string savedItems = "";
-                foreach (Item i in Backpack.StoredItems){
-                    savedItems += i.Name + ";";
-                }
-                gameData = new Saves.Data(gameDayNumber, gameTime, farthestScene, currentScene, savedItems, changedTiles);
-                Saves.SaveGame(gameData);
-                result = gate.Object;
-            }
-        }
-        foreach (Item mapItem in MapItemList){
-            if (mapItem.Collider.IsTouching(Player.Collider) && Input.GetKey(Interact)){
-                Debug.Log("Item picked up");
-                Destroy(mapItem.Object);
-                Backpack.StoredItems.Add(mapItem);
-                UpdateToggles();
-                result = mapItem.Object;
-            }
-        }
-        if (GameObject.FindGameObjectsWithTag("Rock").Length > 0){
-            GameObject[] rockArray = GameObject.FindGameObjectsWithTag("Rock");
-            foreach (GameObject rock in rockArray){
-                if (rock.GetComponent<Collider2D>().IsTouching(Player.Collider) && Input.GetKey(UseItem)){
-                    result = rock;
+        if (this.GetComponent<Collider>() == Player.Collider){
+            foreach (Gate gate in GateList){
+                if (gate.Collider == collision.collider && Input.GetKey(Interact)){
+                    Debug.Log("Interaction triggered with Gate");
+                    currentScene = gate.Destination;
+                    if (farthestScene < gate.Destination){
+                        farthestScene = gate.Destination;
+                    }
+                    SceneManager.LoadScene(SceneList[gate.Destination], LoadSceneMode.Single);
+                    string savedItems = "";
+                    foreach (Item i in Backpack.StoredItems){
+                        savedItems += i.Name + ";";
+                    }
+                    gameData = new Saves.Data(gameDayNumber, gameTime, farthestScene, currentScene, savedItems, placedObjects);
+                    Saves.SaveGame(gameData);
+                    result = gate.Object;
                 }
             }
-        }
-        if (GameObject.FindGameObjectsWithTag("Tree").Length > 0){
-            GameObject[] treeArray = GameObject.FindGameObjectsWithTag("Tree");
-            foreach (GameObject tree in treeArray){
-                if (tree.GetComponent<Collider2D>().IsTouching(Player.Collider) && Input.GetKey(UseItem)){
-                    result = tree;
+            foreach (Item mapItem in MapItemList){
+                if (mapItem.Collider == collision.collider && Input.GetKey(Interact)){
+                    Debug.Log("Item picked up");
+                    Destroy(mapItem.Object);
+                    Backpack.StoredItems.Add(mapItem);
+                    UpdateToggles();
+                    result = mapItem.Object;
+                }
+            }
+            if (GameObject.FindGameObjectsWithTag("Rock").Length > 0){
+                GameObject[] rockArray = GameObject.FindGameObjectsWithTag("Rock");
+                foreach (GameObject rock in rockArray){
+                    if (rock.GetComponent<Collider>() == collision.collider && Input.GetKey(UseItem)){
+                        result = rock;
+                    }
+                }
+            }
+            if (GameObject.FindGameObjectsWithTag("Tree").Length > 0){
+                GameObject[] treeArray = GameObject.FindGameObjectsWithTag("Tree");
+                foreach (GameObject tree in treeArray){
+                    if (tree.GetComponent<Collider>() == collision.collider && Input.GetKey(UseItem)){
+                        result = tree;
+                    }
                 }
             }
         }
         return result;
-    } */
+    }
 
     // Triggered when the script is enabled and first run
     void Start(){
@@ -436,7 +455,7 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
         standardCameraSize = MainCamera.orthographicSize;
         cameraIsStandardSized = true;
         Daylight = GameObject.FindWithTag("Daylight").GetComponent<Light>();
-        lengthOfDay = 48.0f;
+        lengthOfDay = 600.0f;
         maxLightIntensity = 4.0f;
         sunrise = lengthOfDay / 4;
         sunset = lengthOfDay / 4 * 3;
@@ -454,7 +473,6 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
 
     void FixedUpdate(){
         MoveCharacter(Player);
-       // CollisionCheck();
     }
 
     void Update(){
@@ -469,9 +487,9 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
         ClockTick();
         ItemUseCheck();
 
-        /* if (ShotProjectile != null && (ShotProjectileObject.transform.position - ShotProjectileStart).magnitude >= ShotProjectile.Distance){
+        if (ShotProjectile != null && (ShotProjectileObject.transform.position - ShotProjectileStart).magnitude >= ShotProjectile.Distance){
                 GameObject.Destroy(ShotProjectileObject);
                 ShotProjectile = null;
-        } */
+        }
     }
 }

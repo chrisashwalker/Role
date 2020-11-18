@@ -128,7 +128,7 @@ public class Projectile : Item{
         get;set;
     }
 
-    public Projectile(string setName = "Item", int setValue = 1, int setStrength = 1, float setDistance = 3.0f, int setQuantity = 5){
+    public Projectile(string setName = "Item", int setValue = 1, int setStrength = 1, float setDistance = 24.0f, int setQuantity = 5){
         name = setName;
         value = setValue;
         strength = setStrength;
@@ -137,5 +137,5 @@ public class Projectile : Item{
         type = ItemTypes.PROJECTILE;
     }
 
-    public static Projectile Bow = new Projectile(setName:"Bow", setStrength:1, setDistance:3.0f, setQuantity:5);
+    public static Projectile Bow = new Projectile(setName:"Bow", setStrength:1, setDistance:24.0f, setQuantity:5);
 }
