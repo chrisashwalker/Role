@@ -53,6 +53,9 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
     private KeyCode ScrollRight = KeyCode.Period;
     private KeyCode UseItem = KeyCode.Slash;
 
+    private GameObject target;
+    private float cellSize = 10.0f;
+
 
     void LoadGameItems(){
         GameItemList = new List<Item>();
@@ -152,21 +155,35 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
         ShotProjectileStart = ShotProjectileObject.transform.position;            
     }
 
-    /* void UseTool(Character worker){
-        Tool UsedTool = (Tool) Backpack.StoredItems[Backpack.EquippedItemIndex];
-        Vector3Int TargetTilePosition = Vector3Int.FloorToInt(worker.Rigidbody.position);
-        if (worker.SpriteRenderer.sprite == worker.Down){
-            TargetTilePosition.y += -1;
-        } else if (worker.SpriteRenderer.sprite == worker.Right){
-            TargetTilePosition.x += 1;
-        } else if (worker.SpriteRenderer.sprite == worker.Up){
-            TargetTilePosition.y += 1;
-        } else if (worker.SpriteRenderer.sprite == worker.Left){
-            TargetTilePosition.x += -1;
+    void findTarget(){
+        if (target == null){
+            target = new GameObject("Target");
+            SpriteRenderer targetRenderer = target.AddComponent<SpriteRenderer>();
+            Sprite targetSprite = Sprite.Create(ProjectileTexture, new Rect(0, 0, 128.0f, 128.0f), new Vector2(0.5f, 0.5f), 256.0f);
+            targetRenderer.sprite = targetSprite;
+            targetRenderer.sortingLayerName = "Player";
         }
+        float targetX, targetY, targetZ;
+        targetY = Player.Rigidbody.position.y;
+        if (Player.Direction == 'D'){
+            targetX = Player.Rigidbody.position.x;
+            targetZ = (float) System.Math.Floor(Player.Rigidbody.position.z / cellSize) * cellSize - cellSize;
+        } else if (Player.Direction == 'U'){
+            targetX = Player.Rigidbody.position.x;
+            targetZ = (float) System.Math.Floor(Player.Rigidbody.position.z / cellSize) * cellSize + cellSize;
+        } else if (Player.Direction == 'L'){
+            targetX = (float) System.Math.Floor(Player.Rigidbody.position.x / cellSize) * cellSize - cellSize;
+            targetZ = Player.Rigidbody.position.z;
+        } else {
+            targetX = (float) System.Math.Floor(Player.Rigidbody.position.x / cellSize) * cellSize + cellSize;
+            targetZ = Player.Rigidbody.position.z;
+        }
+        target.transform.position = new Vector3(targetX,targetY,targetZ);
+    }
+
+    /* void UseTool(Character worker){ //TODO: Fix
+        Tool UsedTool = (Tool) Backpack.StoredItems[Backpack.EquippedItemIndex];
         ToolFunctions UsedToolFunction = UsedTool.Function;
-        Sprite TargetTileSprite = SceneTilemap.GetSprite(TargetTilePosition);
-        Sprite NewTileSprite = null;
         if (UsedToolFunction.Equals(ToolFunctions.WATER) && TargetTileSprite.Equals(Mud)){
             NewTileSprite = PreparedMud;
         } else if (UsedToolFunction.Equals(ToolFunctions.SEED) && TargetTileSprite.Equals(PreparedMud)){
@@ -193,7 +210,7 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
                     Backpack.StoredItems.Add(Food.Plant);
                 }
             } else if (UsedToolFunction.Equals(ToolFunctions.PICKAXE) || (UsedToolFunction.Equals(ToolFunctions.AXE))){
-                /* GameObject collidedItem = CollisionCheck();
+                GameObject collidedItem = onCollisionStay();
                 if (collidedItem != null){
                     if (collidedItem.tag == "Rock" && UsedToolFunction.Equals(ToolFunctions.PICKAXE)){
                         GameObject.Destroy(collidedItem);
@@ -360,7 +377,7 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
         }
     }
 
-    GameObject onCollisionStay(Collision collision){
+    GameObject onCollisionStay(Collision collision){ // TODO: Fix
         GameObject result = null;
         if (this.GetComponent<Collider>() == Player.Collider){
             foreach (Gate gate in GateList){
@@ -473,6 +490,7 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
 
     void FixedUpdate(){
         MoveCharacter(Player);
+        findTarget();
     }
 
     void Update(){
