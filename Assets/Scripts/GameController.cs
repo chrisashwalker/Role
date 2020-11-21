@@ -5,6 +5,13 @@ using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour, IPointerClickHandler{
+
+    public static GameController Instance;
+
+    void Awake(){
+        Instance = this;
+    }
+
     private Camera MainCamera;
     private float standardCameraSize;
     private bool cameraIsStandardSized;
@@ -23,7 +30,7 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
     private List<placedObject> placedObjects = new List<placedObject>();
 
     private GameObject[] CharacterArray;
-    private Character Player;
+    public Character Player;
     private Vector3 RoundedPosition;
 
     private Inventory Backpack = Inventory.Backpack;
@@ -33,6 +40,10 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
     private List<GameObject> Trees;
     private GameObject FullCanvas;
     public GameObject ItemToggle; // Toggle prefab set via Unity object settings
+    public GameObject Prepared;
+    public GameObject Placed;
+    public GameObject Ready;
+
     private float toggleWidth = 100.0f;
     private float toggleHeight = 25.0f;
 
@@ -54,9 +65,10 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
     private KeyCode UseItem = KeyCode.Slash;
 
     private GameObject target;
-    private float cellSize = 10.0f;
+    private float cellSize = 1.0f;
     private Terrain terrain;
     private GameObject result;
+    public LayerMask interactiveLayer;
 
 
     void LoadGameItems(){
@@ -138,7 +150,7 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
         SpriteRenderer ShotProjectileSpriteRenderer = ShotProjectileObject.AddComponent<SpriteRenderer>();
         Rigidbody ShotProjectileRigidbody = ShotProjectileObject.AddComponent<Rigidbody>();
         ShotProjectileRigidbody.useGravity = false;
-        Sprite ShotProjectileSprite = Sprite.Create(ProjectileTexture, new Rect(0, 0, 128.0f, 128.0f), new Vector2(0.5f, 0.5f), 256.0f);
+        Sprite ShotProjectileSprite = Sprite.Create(ProjectileTexture, new Rect(0, 0, 128.0f, 256.0f), new Vector2(0.5f, 0.5f), 256.0f);
         ShotProjectileSpriteRenderer.sprite = ShotProjectileSprite;
         ShotProjectileSpriteRenderer.sortingLayerName = "Player";
         int projectileShiftX = 0, projectileShiftY = 0, projectileShiftZ = 0;
@@ -161,69 +173,73 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
         if (target == null){
             target = new GameObject("Target");
             SpriteRenderer targetRenderer = target.AddComponent<SpriteRenderer>();
-            Sprite targetSprite = Sprite.Create(ProjectileTexture, new Rect(0, 0, 128.0f, 128.0f), new Vector2(0.5f, 0.5f), 25.6f);
+            Sprite targetSprite = Sprite.Create(ProjectileTexture, new Rect(0, 0, 128.0f, 128.0f), new Vector2(0.5f, 0.5f), 128.0f);
             targetRenderer.sprite = targetSprite;
             targetRenderer.sortingLayerName = "Player";
+            target.transform.Rotate(90f,0f,0f,Space.Self);
         }
         float targetX, targetY, targetZ;
-        targetY = Player.Rigidbody.position.y;
+        targetY = 0.04f;
         if (Player.Direction == 'D'){
-            targetX = (float) System.Math.Floor(Player.Rigidbody.position.x / cellSize) * cellSize + cellSize/2;
-            targetZ = (float) System.Math.Floor(Player.Rigidbody.position.z / cellSize) * cellSize - cellSize/2;
+            targetX = (float) System.Math.Floor(Player.Rigidbody.position.x / cellSize) * cellSize + cellSize;
+            targetZ = (float) System.Math.Floor(Player.Rigidbody.position.z / cellSize) * cellSize - cellSize;
         } else if (Player.Direction == 'U'){
-            targetX = (float) System.Math.Floor(Player.Rigidbody.position.x / cellSize) * cellSize + cellSize/2;
-            targetZ = (float) System.Math.Ceiling(Player.Rigidbody.position.z / cellSize) * cellSize + cellSize/2;
+            targetX = (float) System.Math.Floor(Player.Rigidbody.position.x / cellSize) * cellSize + cellSize;
+            targetZ = (float) System.Math.Ceiling(Player.Rigidbody.position.z / cellSize) * cellSize + cellSize;
         } else if (Player.Direction == 'L'){
-            targetX = (float) System.Math.Floor(Player.Rigidbody.position.x / cellSize) * cellSize - cellSize/2;
-            targetZ = (float) System.Math.Floor(Player.Rigidbody.position.z / cellSize) * cellSize + cellSize/2;
+            targetX = (float) System.Math.Floor(Player.Rigidbody.position.x / cellSize) * cellSize - cellSize;
+            targetZ = (float) System.Math.Floor(Player.Rigidbody.position.z / cellSize) * cellSize + cellSize;
         } else {
-            targetX = (float) System.Math.Ceiling(Player.Rigidbody.position.x / cellSize) * cellSize + cellSize/2;
-            targetZ = (float) System.Math.Floor(Player.Rigidbody.position.z / cellSize) * cellSize + cellSize/2;
+            targetX = (float) System.Math.Ceiling(Player.Rigidbody.position.x / cellSize) * cellSize + cellSize;
+            targetZ = (float) System.Math.Floor(Player.Rigidbody.position.z / cellSize) * cellSize + cellSize;
         }
         target.transform.position = new Vector3(targetX,targetY,targetZ);
     }
 
-    void UseTool(Character worker){ //TODO: Fix
+    void UseTool(Character worker){
         Tool UsedTool = (Tool) Backpack.StoredItems[Backpack.EquippedItemIndex];
         ToolFunctions UsedToolFunction = UsedTool.Function;
-        if (UsedToolFunction.Equals(ToolFunctions.WATER) && result.tag == "Land"){
-            GameObject preparedMud = new GameObject("preparedMud");
-            preparedMud.transform.position = target.transform.position;
-        } else if (UsedToolFunction.Equals(ToolFunctions.SEED)){
-            GameObject plantedSeed = new GameObject("plantedSeed");
-            plantedSeed.transform.position = target.transform.position;
-            if (UsedTool.Durability > 1){
-                UsedTool.Durability -= 1;
-            } else {
-                Backpack.StoredItems.Remove(UsedTool);
-                Backpack.EquippedItemIndex = 0;
-            }
+        Collider[] hitColliders = Physics.OverlapBox(target.transform.position, new Vector3(0.1f,0.1f,0.1f), Quaternion.identity, interactiveLayer);
+        GameObject hitCollider = null;
+        if (hitColliders.Length > 0){
+            hitCollider = hitColliders[0].gameObject;
         }
-        if (Backpack.MaxCapacity > Backpack.StoredItems.Count){
-            if (UsedToolFunction.Equals(ToolFunctions.SHOVEL)){
-                GameObject hole = new GameObject("hole");
-                hole.transform.position = target.transform.position;
-                if (Backpack.StoredItems.Contains(Tool.Seed)){
-                    Tool collectedSeed = (Tool) Backpack.StoredItems.Find(x => x.Equals(Tool.Seed));
-                    collectedSeed.Durability += 1;
+        if (hitCollider == null){
+            if (UsedToolFunction.Equals(ToolFunctions.WATER)){
+                GameObject prepared = Instantiate(Prepared);
+                prepared.transform.position = target.transform.position;
+            }
+        } else {
+            if (UsedToolFunction.Equals(ToolFunctions.SEED) && hitCollider.tag == "Prepared"){
+                GameObject.Destroy(hitCollider);
+                GameObject placed = Instantiate(Placed);
+                placed.transform.position = target.transform.position;
+                if (UsedTool.Durability > 1){
+                    UsedTool.Durability -= 1;
                 } else {
-                    Backpack.StoredItems.Add(Tool.Seed);
+                    Backpack.StoredItems.Remove(UsedTool);
+                    Backpack.EquippedItemIndex = 0;
                 }
-            } else if (UsedToolFunction.Equals(ToolFunctions.SHOVEL) && Backpack.MaxCapacity >= Backpack.StoredItems.Count + Food.Plant.Strength){
-                GameObject hole = new GameObject("hole");
-                hole.transform.position = target.transform.position;
-                for (int i = 0; i < Food.Plant.Strength; i++){
-                    Backpack.StoredItems.Add(Food.Plant);
-                }
-            } else if (UsedToolFunction.Equals(ToolFunctions.PICKAXE) || (UsedToolFunction.Equals(ToolFunctions.AXE))){
-                if (result != null){
-                    if (result.tag == "Rock" && UsedToolFunction.Equals(ToolFunctions.PICKAXE)){
-                        GameObject.Destroy(result);
-                        Backpack.StoredItems.Add(Item.Stone);
-                    } else if (result.tag == "Tree" && UsedToolFunction.Equals(ToolFunctions.AXE)){
-                        GameObject.Destroy(result);
-                        Backpack.StoredItems.Add(Item.Wood);
+            } else if (Backpack.MaxCapacity > Backpack.StoredItems.Count){
+                if (UsedToolFunction.Equals(ToolFunctions.SHOVEL) && hitCollider.tag == "Placed"){
+                    GameObject.Destroy(hitCollider);
+                    if (Backpack.StoredItems.Contains(Tool.Seed)){
+                        Tool collectedSeed = (Tool) Backpack.StoredItems.Find(x => x.Equals(Tool.Seed));
+                        collectedSeed.Durability += 1;
+                    } else {
+                        Backpack.StoredItems.Add(Tool.Seed);
                     }
+                } else if (UsedToolFunction.Equals(ToolFunctions.SHOVEL) && Backpack.MaxCapacity >= Backpack.StoredItems.Count + Food.Plant.Strength  && hitCollider.tag == "Ready"){
+                    GameObject.Destroy(hitCollider);
+                    for (int i = 0; i < Food.Plant.Strength; i++){
+                        Backpack.StoredItems.Add(Food.Plant);
+                    }
+                } else if (hitCollider.tag == "Rock" && UsedToolFunction.Equals(ToolFunctions.PICKAXE)){
+                    GameObject.Destroy(hitCollider);
+                    Backpack.StoredItems.Add(Item.Stone);
+                } else if (hitCollider.tag == "Tree" && UsedToolFunction.Equals(ToolFunctions.AXE)){
+                    GameObject.Destroy(hitCollider);
+                    Backpack.StoredItems.Add(Item.Wood);
                 }
             }
         }
@@ -247,12 +263,10 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
             UpdateToggles();
         }
         if (Input.GetKeyDown(UseItem)){
-            Debug.Log(Backpack.StoredItems[Backpack.EquippedItemIndex].Name + " was used");
-
             if (Backpack.StoredItems[Backpack.EquippedItemIndex].Type.Equals(ItemTypes.PROJECTILE) && ShotProjectile == null){
                 ShootProjectile(Player);
             } else if (Backpack.StoredItems[Backpack.EquippedItemIndex].Type.Equals(ItemTypes.TOOL)){
-                //UseTool(Player);   
+                UseTool(Player);   
             }
             UpdateToggles();     
         }
@@ -376,52 +390,46 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
         }
     }
 
-    void onCollisionStay(Collision collision){ // TODO: Fix
-        result = null;
-        if (this.GetComponent<Collider>() == Player.Collider){
-            if (GameObject.FindGameObjectWithTag("Land").GetComponent<Collider>() == collision.collider){
-                result = GameObject.FindGameObjectWithTag("Land");
+    public void CollisionCheck(Collision collision){
+        foreach (Gate gate in GateList){
+            if (gate.Collider == collision.collider && Input.GetKey(Interact)){
+                Debug.Log("Interaction triggered with Gate");
+                currentScene = gate.Destination;
+                if (farthestScene < gate.Destination){
+                    farthestScene = gate.Destination;
+                }
+                SceneManager.LoadScene(SceneList[gate.Destination], LoadSceneMode.Single);
+                string savedItems = "";
+                foreach (Item i in Backpack.StoredItems){
+                    savedItems += i.Name + ";";
+                }
+                gameData = new Saves.Data(gameDayNumber, gameTime, farthestScene, currentScene, savedItems, placedObjects);
+                Saves.SaveGame(gameData);
+                result = gate.Object;
             }
-            foreach (Gate gate in GateList){
-                if (gate.Collider == collision.collider && Input.GetKey(Interact)){
-                    Debug.Log("Interaction triggered with Gate");
-                    currentScene = gate.Destination;
-                    if (farthestScene < gate.Destination){
-                        farthestScene = gate.Destination;
-                    }
-                    SceneManager.LoadScene(SceneList[gate.Destination], LoadSceneMode.Single);
-                    string savedItems = "";
-                    foreach (Item i in Backpack.StoredItems){
-                        savedItems += i.Name + ";";
-                    }
-                    gameData = new Saves.Data(gameDayNumber, gameTime, farthestScene, currentScene, savedItems, placedObjects);
-                    Saves.SaveGame(gameData);
-                    result = gate.Object;
+        }
+        foreach (Item mapItem in MapItemList){
+            if (mapItem.Collider == collision.collider && Input.GetKey(Interact)){
+                Debug.Log("Item picked up");
+                Destroy(mapItem.Object);
+                Backpack.StoredItems.Add(mapItem);
+                UpdateToggles();
+                result = mapItem.Object;
+            }
+        }
+        if (GameObject.FindGameObjectsWithTag("Rock").Length > 0){
+            GameObject[] rockArray = GameObject.FindGameObjectsWithTag("Rock");
+            foreach (GameObject rock in rockArray){
+                if (rock.GetComponent<Collider>() == collision.collider && Input.GetKey(UseItem)){
+                    result = rock;
                 }
             }
-            foreach (Item mapItem in MapItemList){
-                if (mapItem.Collider == collision.collider && Input.GetKey(Interact)){
-                    Debug.Log("Item picked up");
-                    Destroy(mapItem.Object);
-                    Backpack.StoredItems.Add(mapItem);
-                    UpdateToggles();
-                    result = mapItem.Object;
-                }
-            }
-            if (GameObject.FindGameObjectsWithTag("Rock").Length > 0){
-                GameObject[] rockArray = GameObject.FindGameObjectsWithTag("Rock");
-                foreach (GameObject rock in rockArray){
-                    if (rock.GetComponent<Collider>() == collision.collider && Input.GetKey(UseItem)){
-                        result = rock;
-                    }
-                }
-            }
-            if (GameObject.FindGameObjectsWithTag("Tree").Length > 0){
-                GameObject[] treeArray = GameObject.FindGameObjectsWithTag("Tree");
-                foreach (GameObject tree in treeArray){
-                    if (tree.GetComponent<Collider>() == collision.collider && Input.GetKey(UseItem)){
-                        result = tree;
-                    }
+        }
+        if (GameObject.FindGameObjectsWithTag("Tree").Length > 0){
+            GameObject[] treeArray = GameObject.FindGameObjectsWithTag("Tree");
+            foreach (GameObject tree in treeArray){
+                if (tree.GetComponent<Collider>() == collision.collider && Input.GetKey(UseItem)){
+                    result = tree;
                 }
             }
         }
