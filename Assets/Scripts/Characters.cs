@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 using UnityEngine;
 
 public enum CharacterTypes{
@@ -36,8 +34,8 @@ public class UnityCharacter : Character{
     public Collider Collider{get;set;}
     public int Identifier{get;set;}
 
-    public UnityCharacter(){
-        Object = (GameObject) GameObject.Instantiate(Resources.Load(Name, typeof(GameObject)));
+    public UnityCharacter(string setName){
+        Object = (GameObject) GameObject.Instantiate(Resources.Load(setName, typeof(GameObject)));
         Name = Object.name;
         Rigidbody = Object.GetComponent<Rigidbody>();
         Collider = Object.GetComponent<Collider>();
