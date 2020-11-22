@@ -1,9 +1,9 @@
 using UnityEngine;
 
 public enum CharacterTypes{
-    PLAYER,
+    Player,
     NPC,
-    ENEMY
+    Enemy
 }
 
 public abstract class Character{
@@ -41,7 +41,7 @@ public class UnityCharacter : Character{
         Collider = Object.GetComponent<Collider>();
         Identifier = Object.GetInstanceID();
         if (Object.tag == "Player"){
-            Type = CharacterTypes.PLAYER;
+            Type = CharacterTypes.Player;
         }
     }
 }

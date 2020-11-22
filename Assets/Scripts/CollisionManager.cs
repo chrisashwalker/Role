@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class CollisionTest : MonoBehaviour{
+public class CollisionManager : MonoBehaviour{
     void OnCollisionStay(Collision collision){
         GameController.Instance.CollisionCheck(collision);
     }

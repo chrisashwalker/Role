@@ -1,5 +1,8 @@
 using System.Collections.Generic;
 
+using UnityEngine;
+using UnityEngine.UI;
+
 public sealed class Inventory{
     public int MaxCapacity{get;set;}
     public List<Item> StoredItems{get;set;} 
@@ -11,6 +14,16 @@ public sealed class Inventory{
         EquippedItemIndex = 0;
     }
     public static Inventory Backpack = new Inventory();
+
+    public void LoadStandardItems(){
+        Backpack.StoredItems.Add(ItemList.Sword);
+        Backpack.StoredItems.Add(ItemList.Shovel);
+        Backpack.StoredItems.Add(ItemList.Pickaxe);
+        Backpack.StoredItems.Add(ItemList.Axe);
+        Backpack.StoredItems.Add(ItemList.WateringCan);
+        Backpack.StoredItems.Add(ItemList.Bow);
+        Backpack.StoredItems.Add(ItemList.Seed);
+    }
 }
 
 public enum ItemTypes{
@@ -96,4 +109,73 @@ public sealed class ItemList{
     public static Tool Seed = new Tool(setName:"Seed", setStrength:5, setDurability: 3, setFunction:ToolFunctions.SEED);
     public static Projectile Bow = new Projectile(setName:"Bow", setStrength:1, setDistance:24.0f, setQuantity:5);
     public static Food Plant = new Food(setName:"Plant", setCondition:2);
+}
+
+public sealed class InventoryManager{
+    public static float toggleWidth = 100.0f;
+    public static float toggleHeight = 25.0f;
+
+    // TODO: Improve
+    public static void UpdateToggles(){
+        GameObject fullCanvas = GameObject.FindWithTag("FullCanvas");
+        GameObject[] allItemToggles = GameObject.FindGameObjectsWithTag("ItemToggle");
+        foreach (GameObject toggle in allItemToggles){
+            toggle.SetActive(false);
+            GameObject.Destroy(toggle);
+        }
+        foreach (Item item in Inventory.Backpack.StoredItems){
+            GameObject newToggleObject = GameObject.Instantiate(Resources.Load<GameObject>("ItemToggle"));
+            newToggleObject.tag = "ItemToggle";
+            newToggleObject.transform.SetParent(fullCanvas.transform, false);
+            string itemLabel;
+            int itemDurability;
+            if (item.Type == ItemTypes.TOOL){
+                Tool thisTool = (Tool) item;
+                itemDurability = thisTool.Durability;
+                if (itemDurability > 0){
+                    itemLabel = thisTool.Name + " (" + itemDurability + ")";
+                } else{
+                    itemLabel = item.Name;
+                }
+            } else {
+                itemLabel = item.Name;
+            }
+            newToggleObject.GetComponentInChildren<Text>().text = itemLabel;
+        }
+        allItemToggles = GameObject.FindGameObjectsWithTag("ItemToggle");
+        int toggleCount = allItemToggles.Length;
+        foreach (GameObject toggle in allItemToggles){
+            int toggleIndex = System.Array.IndexOf(allItemToggles, toggle);
+            float positionFromCenter = toggleIndex - ((float) toggleCount / 2) + 0.5f;
+            toggle.GetComponent<RectTransform>().anchoredPosition = new Vector2(positionFromCenter * toggleWidth,toggleHeight);
+            if (toggleIndex == Inventory.Backpack.EquippedItemIndex){
+                toggle.GetComponentInChildren<Text>().text = toggle.GetComponentInChildren<Text>().text.ToUpper();
+            }
+        }
+    }
+
+    public static void Equip(GameObject clickedToggle){
+        foreach (Item item in Inventory.Backpack.StoredItems){
+            if (clickedToggle.GetComponentInChildren<Text>().text == item.Name){
+                Inventory.Backpack.EquippedItemIndex = Inventory.Backpack.StoredItems.IndexOf(item);
+            }
+        }
+        UpdateToggles();
+    }
+}
+
+public class UnityProjectile : Projectile{
+    public GameObject Object{get;set;}
+    public Rigidbody Rigidbody{get;set;}
+    public Collider Collider{get;set;}
+    public int Identifier{get;set;}
+    public Vector3 Origin{get;set;}
+
+    public UnityProjectile(string setName){
+        Object = (GameObject) GameObject.Instantiate(Resources.Load(setName, typeof(GameObject)));
+        Name = Object.name;
+        Rigidbody = Object.GetComponent<Rigidbody>();
+        Collider = Object.GetComponent<Collider>();
+        Identifier = Object.GetInstanceID();
+    }
 }

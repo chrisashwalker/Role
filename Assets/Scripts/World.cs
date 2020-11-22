@@ -1,9 +1,14 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+public sealed class World{
+    public Dictionary<int, string> SceneList;
+    public List<Gate> GateList;
+}
+
 public enum BarrierTypes{
-    BARRIER,
-    GATE
+    Barrier,
+    Gate
 }
 
 public class Barrier{
@@ -11,7 +16,7 @@ public class Barrier{
         public int Durability{get;set;}
 
         public Barrier(int setDurability = 0){
-            Type = BarrierTypes.BARRIER;
+            Type = BarrierTypes.Barrier;
             Durability = setDurability;
         }
     }
@@ -21,7 +26,7 @@ public class Gate : Barrier{
     public bool Locked{get;set;}
 
     public Gate(bool setLocked = false){
-        Type = BarrierTypes.GATE;
+        Type = BarrierTypes.Gate;
         Locked = setLocked;
     }
 }
