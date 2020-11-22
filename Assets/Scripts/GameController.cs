@@ -64,6 +64,7 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
     private KeyCode ScrollRight = KeyCode.Period;
     private KeyCode UseItem = KeyCode.Slash;
 
+    public GameObject targetPrefab;
     private GameObject target;
     private float cellSize = 1.0f;
     private Terrain terrain;
@@ -171,12 +172,7 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
 
     void findTarget(){
         if (target == null){
-            target = new GameObject("Target");
-            SpriteRenderer targetRenderer = target.AddComponent<SpriteRenderer>();
-            Sprite targetSprite = Sprite.Create(ProjectileTexture, new Rect(0, 0, 128.0f, 128.0f), new Vector2(0.5f, 0.5f), 128.0f);
-            targetRenderer.sprite = targetSprite;
-            targetRenderer.sortingLayerName = "Player";
-            target.transform.Rotate(90f,0f,0f,Space.Self);
+            target = Instantiate(targetPrefab);
         }
         float targetX, targetY, targetZ;
         targetY = 0.04f;
@@ -208,12 +204,14 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
             if (UsedToolFunction.Equals(ToolFunctions.WATER)){
                 GameObject prepared = Instantiate(Prepared);
                 prepared.transform.position = target.transform.position;
+                placedObjects.Add(new placedObject(Prepared.name, SceneManager.GetActiveScene(), prepared.transform.position, prepared.GetHashCode()));
             }
         } else {
             if (UsedToolFunction.Equals(ToolFunctions.SEED) && hitCollider.tag == "Prepared"){
                 GameObject.Destroy(hitCollider);
                 GameObject placed = Instantiate(Placed);
                 placed.transform.position = target.transform.position;
+                placedObjects.Add(new placedObject(Placed.name, SceneManager.GetActiveScene(), placed.transform.position, placed.GetHashCode()));
                 if (UsedTool.Durability > 1){
                     UsedTool.Durability -= 1;
                 } else {
@@ -223,6 +221,7 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
             } else if (Backpack.MaxCapacity > Backpack.StoredItems.Count){
                 if (UsedToolFunction.Equals(ToolFunctions.SHOVEL) && hitCollider.tag == "Placed"){
                     GameObject.Destroy(hitCollider);
+                    placedObjects.Remove(placedObjects.Find(x => x.hashCode.Equals(hitCollider.GetHashCode())));
                     if (Backpack.StoredItems.Contains(Tool.Seed)){
                         Tool collectedSeed = (Tool) Backpack.StoredItems.Find(x => x.Equals(Tool.Seed));
                         collectedSeed.Durability += 1;
@@ -231,6 +230,7 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
                     }
                 } else if (UsedToolFunction.Equals(ToolFunctions.SHOVEL) && Backpack.MaxCapacity >= Backpack.StoredItems.Count + Food.Plant.Strength  && hitCollider.tag == "Ready"){
                     GameObject.Destroy(hitCollider);
+                    placedObjects.Remove(placedObjects.Find(x => x.hashCode.Equals(hitCollider.GetHashCode())));
                     for (int i = 0; i < Food.Plant.Strength; i++){
                         Backpack.StoredItems.Add(Food.Plant);
                     }
@@ -339,7 +339,7 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
     }
 
     void FastTravel(int sceneNumber){
-        if (farthestScene >= sceneNumber && currentScene != sceneNumber){
+        //if (farthestScene >= sceneNumber && currentScene != sceneNumber){ TODO: Reactivate after testing
             currentScene = sceneNumber;
             SceneManager.LoadScene(SceneList[sceneNumber], LoadSceneMode.Single);
             string savedItems = "";
@@ -348,7 +348,7 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
             }
             gameData = new Saves.Data(gameDayNumber, gameTime, farthestScene, currentScene, savedItems, placedObjects);
             Saves.SaveGame(gameData);
-        }
+        //}
     }
 
     void ClockTick(){
@@ -408,7 +408,7 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
                 result = gate.Object;
             }
         }
-        foreach (Item mapItem in MapItemList){
+        foreach (Item mapItem in MapItemList){ // TODO: Store in save data
             if (mapItem.Collider == collision.collider && Input.GetKey(Interact)){
                 Debug.Log("Item picked up");
                 Destroy(mapItem.Object);
@@ -494,7 +494,8 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
         }
         foreach (placedObject po in placedObjects){
             if (po.scene == SceneManager.GetActiveScene().name){
-                
+                GameObject loadedPo = Instantiate(Resources.Load(po.prefab, typeof(GameObject))) as GameObject;
+                loadedPo.transform.position = new Vector3(po.positionx, po.positiony, po.positionz);
             }
         }
     }

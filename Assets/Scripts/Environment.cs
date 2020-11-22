@@ -50,19 +50,21 @@ public class Plant : Barrier{
 
 [System.Serializable]
 public class placedObject{
-    public string changeType;
+    public string prefab;
     public string scene;
-    public int positionx;
-    public int positiony;
-    public int positionz;
+    public float positionx;
+    public float positiony;
+    public float positionz;
     public int daysPlaced;
+    public int hashCode; // TODO: not necessarily unique
 
-    public placedObject(string setChangeType, Scene setScene, Vector3Int setPosition, int setDaysPlaced){
-        changeType = setChangeType;
+    public placedObject(string setPrefab, Scene setScene, Vector3 setPosition, int setHashCode, int setDaysPlaced = 0){
+        prefab = setPrefab;
         scene = setScene.name;
         positionx = setPosition.x;
         positiony = setPosition.y;
         positionz = setPosition.z;
         daysPlaced = setDaysPlaced;
+        hashCode = setHashCode;
     }
 }
