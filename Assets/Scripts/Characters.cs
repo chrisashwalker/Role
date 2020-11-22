@@ -1,52 +1,25 @@
 using System.Collections.Generic;
+
 using UnityEngine;
 
-public enum TagList{
+public enum CharacterTypes{
     PLAYER,
-    CHARACTER,
+    NPC,
+    ENEMY
 }
 
-public class Character{
-
-    public GameObject Object{
-        get;set;
-    }
-    public Rigidbody Rigidbody{
-        get;set;
-    }
-    public Collider Collider{
-        get;set;
-    }
-    public List<TagList> Tags{
-        get;set;
-    }
-    public string Name{
-        get;set;
-    }
-    public float Speed{
-        get;set;
-    }
-    public int MaxHealth{
-        get;set;
-    } 
-    public int MaxStamina{
-        get;set;
-    } 
-    public int Strength{
-        get;set;
-    } 
-    public int Health{
-        get;set;
-    } 
-    public int Stamina{
-        get;set;
-    }
-
-    public char Direction{
-        get;set;
-    }
+public abstract class Character{
+    public CharacterTypes Type{get;set;}
+    public string Name{get;set;}
+    public int MaxHealth{get;set;} 
+    public int MaxStamina{get;set;} 
+    public float Speed{get;set;}
+    public int Strength{get;set;} 
+    public int Health{get;set;} 
+    public int Stamina{get;set;}
     
-    public Character(string setName = "", float setSpeed = 1.0f, int setMaxHealth = 1, int setMaxStamina = 1, int setStrength = 1){
+    public Character(CharacterTypes setType = CharacterTypes.NPC, string setName = "???", float setSpeed = 1.0f, int setMaxHealth = 1, int setMaxStamina = 1, int setStrength = 1){
+        Type = setType;
         Name = setName;
         Speed = setSpeed;
         MaxHealth = setMaxHealth;
@@ -54,30 +27,23 @@ public class Character{
         Strength = setStrength;
         Health = MaxHealth;
         Stamina = MaxStamina;
-        Tags = new List<TagList>();
-        Direction = 'D';
     }
+}
 
-    public string say(string phrase){ // TODO: Use this
-        string speech = Name + ": " + phrase;
-        return speech;
-    }
+public class UnityCharacter : Character{
+    public GameObject Object{get;set;}
+    public Rigidbody Rigidbody{get;set;}
+    public Collider Collider{get;set;}
+    public int Identifier{get;set;}
 
-    public string eat(Food food){ // TODO: Use this
-        string message = Name + " ate " + food;
-        int newHealth = Health + food.Strength * food.Condition;
-        if (newHealth > MaxHealth){
-            Health = MaxHealth;
-        } else {
-            Health = newHealth;
-        }
-        return message;
-    }
-
-    public void attack(Character target, Item weapon){ // TODO: Use this
-        if (Stamina > 0){
-            target.Health -= Strength + weapon.Strength;
+    public UnityCharacter(){
+        Object = (GameObject) GameObject.Instantiate(Resources.Load(Name, typeof(GameObject)));
+        Name = Object.name;
+        Rigidbody = Object.GetComponent<Rigidbody>();
+        Collider = Object.GetComponent<Collider>();
+        Identifier = Object.GetInstanceID();
+        if (Object.tag == "Player"){
+            Type = CharacterTypes.PLAYER;
         }
     }
-
 }

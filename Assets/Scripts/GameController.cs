@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -10,6 +12,27 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
 
     void Awake(){
         Instance = this;
+    }
+
+    public static void SaveGame(SaveData data){
+        BinaryFormatter formatter = new BinaryFormatter();
+        string path = Application.persistentDataPath + "/save.bin";
+        FileStream stream = new FileStream(path, FileMode.Create);
+        formatter.Serialize(stream, data);
+        stream.Close();
+    }
+    
+    public static SaveData LoadGame(){
+        string path = Application.persistentDataPath + "/save.bin";
+        if (File.Exists(path)){
+            BinaryFormatter formatter = new BinaryFormatter();
+            FileStream stream = new FileStream(path, FileMode.Open);
+            SaveData data = (SaveData) formatter.Deserialize(stream);
+            stream.Close();
+            return data;
+        } else {
+            return null;
+        }
     }
 
     private Camera MainCamera;
@@ -25,9 +48,9 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
     private float gameTime;
     private float daylightTime;
     private int gameDayNumber;
-    private Saves.Data gameData;
+    private Saves.SaveData gameData;
 
-    private List<placedObject> placedObjects = new List<placedObject>();
+    private List<AlteredObject> placedObjects = new List<AlteredObject>();
 
     private GameObject[] CharacterArray;
     public Character Player;
@@ -204,14 +227,14 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
             if (UsedToolFunction.Equals(ToolFunctions.WATER)){
                 GameObject prepared = Instantiate(Prepared);
                 prepared.transform.position = target.transform.position;
-                placedObjects.Add(new placedObject(Prepared.name, SceneManager.GetActiveScene(), prepared.transform.position, prepared.GetHashCode()));
+                placedObjects.Add(new AlteredObject(Prepared.name, SceneManager.GetActiveScene(), prepared.transform.position, prepared.GetHashCode()));
             }
         } else {
             if (UsedToolFunction.Equals(ToolFunctions.SEED) && hitCollider.tag == "Prepared"){
                 GameObject.Destroy(hitCollider);
                 GameObject placed = Instantiate(Placed);
                 placed.transform.position = target.transform.position;
-                placedObjects.Add(new placedObject(Placed.name, SceneManager.GetActiveScene(), placed.transform.position, placed.GetHashCode()));
+                placedObjects.Add(new AlteredObject(Placed.name, SceneManager.GetActiveScene(), placed.transform.position, placed.GetHashCode()));
                 if (UsedTool.Durability > 1){
                     UsedTool.Durability -= 1;
                 } else {
@@ -221,7 +244,7 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
             } else if (Backpack.MaxCapacity > Backpack.StoredItems.Count){
                 if (UsedToolFunction.Equals(ToolFunctions.SHOVEL) && hitCollider.tag == "Placed"){
                     GameObject.Destroy(hitCollider);
-                    placedObjects.Remove(placedObjects.Find(x => x.hashCode.Equals(hitCollider.GetHashCode())));
+                    placedObjects.Remove(placedObjects.Find(x => x.Identifier.Equals(hitCollider.GetHashCode())));
                     if (Backpack.StoredItems.Contains(Tool.Seed)){
                         Tool collectedSeed = (Tool) Backpack.StoredItems.Find(x => x.Equals(Tool.Seed));
                         collectedSeed.Durability += 1;
@@ -230,7 +253,7 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
                     }
                 } else if (UsedToolFunction.Equals(ToolFunctions.SHOVEL) && Backpack.MaxCapacity >= Backpack.StoredItems.Count + Food.Plant.Strength  && hitCollider.tag == "Ready"){
                     GameObject.Destroy(hitCollider);
-                    placedObjects.Remove(placedObjects.Find(x => x.hashCode.Equals(hitCollider.GetHashCode())));
+                    placedObjects.Remove(placedObjects.Find(x => x.Identifier.Equals(hitCollider.GetHashCode())));
                     for (int i = 0; i < Food.Plant.Strength; i++){
                         Backpack.StoredItems.Add(Food.Plant);
                     }
@@ -282,7 +305,7 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
         Player.Object = GameObject.FindWithTag("Player");
         Player.Rigidbody = Player.Object.GetComponent<Rigidbody>();
         Player.Collider = Player.Object.GetComponent<Collider>();
-        Player.Tags.Add(TagList.PLAYER);
+        Player.Type.Add(CharacterTypes.PLAYER);
 
         if (GameObject.FindGameObjectsWithTag("Character").Length > 0){
             CharacterArray = GameObject.FindGameObjectsWithTag("Character");
@@ -291,7 +314,7 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
                 newChar.Object = charObject;
                 newChar.Rigidbody = newChar.Object.GetComponent<Rigidbody>();
                 newChar.Collider = newChar.Object.GetComponent<Collider>();
-                newChar.Tags.Add(TagList.CHARACTER);
+                newChar.Type.Add(CharacterTypes.CHARACTER);
             }
         }
     }
@@ -346,7 +369,7 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
             foreach (Item i in Backpack.StoredItems){
                 savedItems += i.Name + ";";
             }
-            gameData = new Saves.Data(gameDayNumber, gameTime, farthestScene, currentScene, savedItems, placedObjects);
+            gameData = new Saves.SaveData(gameDayNumber, gameTime, farthestScene, currentScene, savedItems, placedObjects);
             Saves.SaveGame(gameData);
         //}
     }
@@ -403,7 +426,7 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
                 foreach (Item i in Backpack.StoredItems){
                     savedItems += i.Name + ";";
                 }
-                gameData = new Saves.Data(gameDayNumber, gameTime, farthestScene, currentScene, savedItems, placedObjects);
+                gameData = new Saves.SaveData(gameDayNumber, gameTime, farthestScene, currentScene, savedItems, placedObjects);
                 Saves.SaveGame(gameData);
                 result = gate.Object;
             }
@@ -492,10 +515,10 @@ public class GameController : MonoBehaviour, IPointerClickHandler{
         if (gameData != null){
             placedObjects = gameData.placedObjects;
         }
-        foreach (placedObject po in placedObjects){
-            if (po.scene == SceneManager.GetActiveScene().name){
-                GameObject loadedPo = Instantiate(Resources.Load(po.prefab, typeof(GameObject))) as GameObject;
-                loadedPo.transform.position = new Vector3(po.positionx, po.positiony, po.positionz);
+        foreach (AlteredObject po in placedObjects){
+            if (po.Scene == SceneManager.GetActiveScene().name){
+                GameObject loadedPo = Instantiate(Resources.Load(po.Prefab, typeof(GameObject))) as GameObject;
+                loadedPo.transform.position = new Vector3(po.PositionX, po.PositionY, po.PositionZ);
             }
         }
     }

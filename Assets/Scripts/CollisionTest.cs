@@ -1,9 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class CollisionTest : MonoBehaviour
-{
+public class CollisionTest : MonoBehaviour{
     void OnCollisionStay(Collision collision){
         GameController.Instance.CollisionCheck(collision);
     }
