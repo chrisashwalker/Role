@@ -1,15 +1,16 @@
 using UnityEngine;
 
-public sealed class Actions{
-    public LayerMask interactiveLayer;
-    public GameObject targetPrefab;
-    public GameObject target;
-    public float cellSize = 1.0f;
-    private Inventory Backpack = Inventory.Backpack;
-    private Character Player = GameController.Instance.Player;
+public static class Actions{
+    public static LayerMask interactiveLayer;
+    public static GameObject targetPrefab;
+    public static GameObject target;
+    public static float cellSize = 1.0f;
+    private static Inventory Backpack = Inventory.Backpack;
+    private static Character Player = GameController.Instance.Player;
+    public static UnityProjectile ShotProjectile;
 
 
-    void ShootProjectile(Character shooter){
+    public static void ShootProjectile(Character shooter){
         ShotProjectile = (Projectile) Backpack.StoredItems[Backpack.EquippedItemIndex];
         ShotProjectileObject = new GameObject("ShotProjectile");
         SpriteRenderer ShotProjectileSpriteRenderer = ShotProjectileObject.AddComponent<SpriteRenderer>();
@@ -56,7 +57,7 @@ public sealed class Actions{
         target.transform.position = new Vector3(targetX,targetY,targetZ);
     }
 
-    void UseTool(Character worker){
+    public static void UseTool(Character worker, GameObject collidedObject){
         Tool UsedTool = (Tool) Backpack.StoredItems[Backpack.EquippedItemIndex];
         ToolFunctions UsedToolFunction = UsedTool.Function;
         Collider[] hitColliders = Physics.OverlapBox(target.transform.position, new Vector3(0.1f,0.1f,0.1f), Quaternion.identity, interactiveLayer);
@@ -98,10 +99,10 @@ public sealed class Actions{
                     for (int i = 0; i < Food.Plant.Strength; i++){
                         Backpack.StoredItems.Add(Food.Plant);
                     }
-                } else if (hitCollider.tag == "Rock" && UsedToolFunction.Equals(ToolFunctions.PICKAXE)){
+                } else if (hitCollider.tag == "Rock" && UsedToolFunction.Equals(ToolFunctions.PICKAXE) && Input.GetKey(Controls.UseItem))){
                     GameObject.Destroy(hitCollider);
                     Backpack.StoredItems.Add(Item.Stone);
-                } else if (hitCollider.tag == "Tree" && UsedToolFunction.Equals(ToolFunctions.AXE)){
+                } else if (hitCollider.tag == "Tree" && UsedToolFunction.Equals(ToolFunctions.AXE) && Input.GetKey(Controls.UseItem))){
                     GameObject.Destroy(hitCollider);
                     Backpack.StoredItems.Add(Item.Wood);
                 }

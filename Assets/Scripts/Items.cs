@@ -2,29 +2,7 @@ using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEngine.UI;
-
-public sealed class Inventory{
-    public int MaxCapacity{get;set;}
-    public List<Item> StoredItems{get;set;} 
-    public int EquippedItemIndex{get;set;}
-    
-    private Inventory(){
-        MaxCapacity = 10;
-        StoredItems = new List<Item>();
-        EquippedItemIndex = 0;
-    }
-    public static Inventory Backpack = new Inventory();
-
-    public void LoadStandardItems(){
-        Backpack.StoredItems.Add(ItemList.Sword);
-        Backpack.StoredItems.Add(ItemList.Shovel);
-        Backpack.StoredItems.Add(ItemList.Pickaxe);
-        Backpack.StoredItems.Add(ItemList.Axe);
-        Backpack.StoredItems.Add(ItemList.WateringCan);
-        Backpack.StoredItems.Add(ItemList.Bow);
-        Backpack.StoredItems.Add(ItemList.Seed);
-    }
-}
+using UnityEngine.EventSystems;
 
 public enum ItemTypes{
     ITEM,
@@ -111,7 +89,36 @@ public sealed class ItemList{
     public static Food Plant = new Food(setName:"Plant", setCondition:2);
 }
 
-public sealed class InventoryManager{
+public sealed class Inventory : IPointerClickHandler{
+
+    public static int MaxCapacity{get;set;} = 10;
+    public static List<Item> StoredItems{get;set;}  = new List<Item>();
+    public static int EquippedItemIndex{get;set;} = 0;
+    public static List<Item> GameItemList{get;set;} = new List<Item>();
+
+    public static void LoadGameItems(){
+        GameItemList.Add(ItemList.Sword);
+        GameItemList.Add(ItemList.Shovel);
+        GameItemList.Add(ItemList.Pickaxe);
+        GameItemList.Add(ItemList.Axe);
+        GameItemList.Add(ItemList.WateringCan);
+        GameItemList.Add(ItemList.Bow);
+        GameItemList.Add(ItemList.Seed);
+        GameItemList.Add(ItemList.Stone);
+        GameItemList.Add(ItemList.Wood);
+        GameItemList.Add(ItemList.Plant);
+    }
+
+    public static void LoadStandardItems(){
+        StoredItems.Add(ItemList.Sword);
+        StoredItems.Add(ItemList.Shovel);
+        StoredItems.Add(ItemList.Pickaxe);
+        StoredItems.Add(ItemList.Axe);
+        StoredItems.Add(ItemList.WateringCan);
+        StoredItems.Add(ItemList.Bow);
+        StoredItems.Add(ItemList.Seed);
+    }
+
     public static float toggleWidth = 100.0f;
     public static float toggleHeight = 25.0f;
 
@@ -123,7 +130,7 @@ public sealed class InventoryManager{
             toggle.SetActive(false);
             GameObject.Destroy(toggle);
         }
-        foreach (Item item in Inventory.Backpack.StoredItems){
+        foreach (Item item in StoredItems){
             GameObject newToggleObject = GameObject.Instantiate(Resources.Load<GameObject>("ItemToggle"));
             newToggleObject.tag = "ItemToggle";
             newToggleObject.transform.SetParent(fullCanvas.transform, false);
@@ -148,20 +155,53 @@ public sealed class InventoryManager{
             int toggleIndex = System.Array.IndexOf(allItemToggles, toggle);
             float positionFromCenter = toggleIndex - ((float) toggleCount / 2) + 0.5f;
             toggle.GetComponent<RectTransform>().anchoredPosition = new Vector2(positionFromCenter * toggleWidth,toggleHeight);
-            if (toggleIndex == Inventory.Backpack.EquippedItemIndex){
+            if (toggleIndex == EquippedItemIndex){
                 toggle.GetComponentInChildren<Text>().text = toggle.GetComponentInChildren<Text>().text.ToUpper();
             }
         }
     }
 
     public static void Equip(GameObject clickedToggle){
-        foreach (Item item in Inventory.Backpack.StoredItems){
+        foreach (Item item in StoredItems){
             if (clickedToggle.GetComponentInChildren<Text>().text == item.Name){
-                Inventory.Backpack.EquippedItemIndex = Inventory.Backpack.StoredItems.IndexOf(item);
+                EquippedItemIndex = StoredItems.IndexOf(item);
             }
         }
         UpdateToggles();
     }
+
+    public void OnPointerClick(PointerEventData pointerEventData){
+        GameObject clickedToggle = pointerEventData.pointerPress;
+        if (clickedToggle.tag == "ItemToggle"){
+            Inventory.Equip(clickedToggle);
+        }
+    }
+
+    void ItemUseCheck(){
+        int itemShift = 0;
+        if (Input.GetKeyDown(Controls.ScrollLeft)){
+            itemShift = -1;
+        } else if (Input.GetKeyDown(Controls.ScrollRight)){
+            itemShift = 1;
+        }
+        if (itemShift != 0){
+            if (EquippedItemIndex + itemShift < 0){
+                EquippedItemIndex = StoredItems.Count - 1;
+            } else if (EquippedItemIndex + itemShift > StoredItems.Count - 1){
+                EquippedItemIndex = 0;
+            } else {
+                EquippedItemIndex += itemShift;
+            }
+            UpdateToggles();
+        }
+        if (Input.GetKeyDown(Controls.UseItem)){
+            if (StoredItems[EquippedItemIndex].Type.Equals(ItemTypes.PROJECTILE) && Actions.ShotProjectile == null){
+                Actions.ShootProjectile(GameController.Instance.Player);
+            }
+            UpdateToggles();     
+        }
+    }
+
 }
 
 public class UnityProjectile : Projectile{

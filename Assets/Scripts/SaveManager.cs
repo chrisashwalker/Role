@@ -4,7 +4,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 using UnityEngine;
 
-public abstract class Saves{
+public static class Saves{
     [System.Serializable]
     public class SaveData{
         public static bool Loaded{get;set;} = false;
@@ -30,7 +30,7 @@ public abstract class Saves{
         }
     }
 
-    public SaveData GameData{get;set;} = new SaveData();
+    public static SaveData GameData{get;set;} = new SaveData();
 
     public static void SaveGame(SaveData data){
         BinaryFormatter formatter = new BinaryFormatter();
