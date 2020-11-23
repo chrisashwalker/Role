@@ -5,9 +5,10 @@ using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
 public static class Saves{
+    public static bool Loaded{get;set;} = false;
+    
     [System.Serializable]
     public class SaveData{
-        public static bool Loaded{get;set;} = false;
         public int GameDay{get;set;}
         public int Progress{get;set;}
         public int CurrentLocation{get;set;}

@@ -4,101 +4,72 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour{
-
     public static GameController Instance;
-
-    public List<Character> Characters;
-    public Character Player;
+    public UnityCharacter Player;
 
     void Awake(){
         Instance = this;
-    }
-
-    // Triggered when the script is enabled and first run
-    void Start(){
-        SceneList = new Dictionary<int, string>();
-        BuildScenes();
-        LoadGameItems();
-        gameData = Saves.LoadGame();
-        
-        if (gameData != null){
-            currentScene = gameData.location;
-            if (Saves.loaded == false){ 
-                SceneManager.LoadScene(SceneList[currentScene]);
-                Saves.loaded = true;
+        World.BuildScenes();
+        Inventory.LoadGameItems();
+        Saves.GameData = Saves.LoadGame();
+        if (Saves.GameData != null){
+            if (Saves.Loaded == false){ 
+                SceneManager.LoadScene(World.SceneList[Saves.GameData.CurrentLocation]);
+                Saves.Loaded = true;
             }
-            gameDayNumber = gameData.day;
-            gameTime = gameData.time;
-            farthestScene = gameData.progress;
-            string savedItems = gameData.items;
+            string savedItems = Saves.GameData.InventoryItems;
             List<string> SavedItemsList = new List<string>(savedItems.Split(';'));
             if (savedItems == ""){
-                LoadStandardItems();
-            } else if (Backpack.StoredItems.Count == 0) {
+                Inventory.LoadStandardItems();
+            } else if (Inventory.StoredItems.Count == 0) {
                 foreach (string itemName in SavedItemsList){
-                    if (GameItemList.Find(x => x.Name == itemName) != null){
-                        Backpack.StoredItems.Add(GameItemList.Find(x => x.Name == itemName));
+                    if (Inventory.GameItemList.Find(x => x.Name == itemName) != null){
+                        Inventory.StoredItems.Add(Inventory.GameItemList.Find(x => x.Name == itemName));
                     }
                 }
             }
-            placedObjects = gameData.placedObjects;
+            Saves.GameData.AlteredObjects = Saves.GameData.AlteredObjects;
         } else {
-            gameDayNumber = 1;
-            gameTime = 0.0f;
-            farthestScene = 1;
-            currentScene = 1;
-            LoadStandardItems();
+            Saves.GameData.GameDay = 1;
+            Saves.GameData.GameTime = 0.0f;
+            Saves.GameData.FarthestLocation = 1;
+            Saves.GameData.CurrentLocation = 1;
+            Inventory.LoadStandardItems();
         }
-
-        Backpack.EquippedItemIndex = 0;
-        UpdateToggles();
-        FindCharacters();
-        FindGates();
-        FindMapItems();
-        FindObjects();
-        MainCamera = GameObject.FindWithTag("MainCamera").GetComponent<Camera>();
-        standardCameraSize = MainCamera.orthographicSize;
-        cameraIsStandardSized = true;
-        Daylight = GameObject.FindWithTag("Daylight").GetComponent<Light>();
-        lengthOfDay = 600.0f;
-        maxLightIntensity = 4.0f;
-        sunrise = lengthOfDay / 4;
-        sunset = lengthOfDay / 4 * 3;
-        lightDensity = maxLightIntensity / sunrise;
-
-        terrain = Terrain.activeTerrain;
-
-        if (gameData != null){
-            placedObjects = gameData.placedObjects;
-        }
-        foreach (AlteredObject po in placedObjects){
+        foreach (AlteredObject po in Saves.GameData.AlteredObjects){
             if (po.Scene == SceneManager.GetActiveScene().name){
                 GameObject loadedPo = Instantiate(Resources.Load(po.Prefab, typeof(GameObject))) as GameObject;
                 loadedPo.transform.position = new Vector3(po.PositionX, po.PositionY, po.PositionZ);
             }
         }
+        Inventory.EquippedItemIndex = 0;
+        Inventory.UpdateToggles();
+        World.FindCharacters();
+        World.FindGates();
+        World.FindMapItems();
+        World.FindObjects();
     }
 
     void FixedUpdate(){
-        MoveCharacter(Player);
-        findTarget();
+        Controls.MoveCharacter(Player);
+        Actions.FindTarget();
+         if (Input.GetKeyDown(Controls.MapZoom)){
+            CameraManager.MapToggle();
+        } else if (Input.GetKeyDown(KeyCode.Alpha1)){
+            World.FastTravel(1);
+        } else if (Input.GetKeyDown(KeyCode.Alpha2)){
+            World.FastTravel(2);
+        }
+        Inventory.ItemUseCheck();
+        foreach (UnityProjectile projectile in Actions.ShotProjectiles){
+            if ((projectile.Rigidbody.transform.position - projectile.Origin).magnitude >= projectile.Distance){
+                GameObject.Destroy(projectile.Object);
+                Actions.ShotProjectiles.Remove(projectile);
+            }
+        }
     }
 
     void Update(){
-        if (Input.GetKeyDown(MapZoom)){
-            MapToggle();
-        } else if (Input.GetKeyDown(KeyCode.Alpha1)){
-            FastTravel(1);
-        } else if (Input.GetKeyDown(KeyCode.Alpha2)){
-            FastTravel(2);
-        }
-
-        ClockTick();
-        ItemUseCheck();
-
-        if (ShotProjectile != null && (ShotProjectileObject.transform.position - ShotProjectileStart).magnitude >= ShotProjectile.Distance){
-                GameObject.Destroy(ShotProjectileObject);
-                ShotProjectile = null;
-        }
+        TimeManager.ClockTick();
     }
 }

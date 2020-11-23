@@ -22,7 +22,7 @@ public class CollisionManager : MonoBehaviour{
                     }
                     SceneManager.LoadScene(World.SceneList[gate.Destination], LoadSceneMode.Single);
                     string savedItems = "";
-                    foreach (Item i in Inventory.Backpack.StoredItems){
+                    foreach (Item i in Inventory.StoredItems){
                         savedItems += i.Name + ";";
                     }
                     Saves.GameData = new Saves.SaveData(Saves.GameData.GameDay, Saves.GameData.GameTime, Saves.GameData.FarthestLocation, Saves.GameData.CurrentLocation, savedItems, Saves.GameData.AlteredObjects);
@@ -32,23 +32,21 @@ public class CollisionManager : MonoBehaviour{
             foreach (UnityMapItem mapItem in World.MapItemList){
                 if (mapItem.Collider == collision.collider && Input.GetKey(Controls.Interact)){
                     Destroy(mapItem.Object);
-                    Inventory.Backpack.StoredItems.Add(mapItem.linkedItem);
+                    Inventory.StoredItems.Add(mapItem.linkedItem);
                     Inventory.UpdateToggles();
                 }
             }
-            if (GameObject.FindGameObjectsWithTag("Rock").Length > 0){
-                GameObject[] rockArray = GameObject.FindGameObjectsWithTag("Rock");
-                foreach (GameObject rock in rockArray){
+            if (World.TreeList.Count > 0){
+                foreach (GameObject rock in World.RockList){
                     if (rock.GetComponent<Collider>() == collision.collider){
-                        Actions.UseTool(character, rock);
+                        Actions.UseTool(rock);
                     }
                 }
             }
-            if (GameObject.FindGameObjectsWithTag("Tree").Length > 0){
-                GameObject[] treeArray = GameObject.FindGameObjectsWithTag("Tree");
-                foreach (GameObject tree in treeArray){
+            if (World.TreeList.Count > 0){
+                foreach (GameObject tree in World.TreeList){
                     if (tree.GetComponent<Collider>() == collision.collider){
-                        Actions.UseTool(character, tree);
+                        Actions.UseTool(tree);
                     }
                 }
             }

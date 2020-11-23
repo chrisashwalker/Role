@@ -1,112 +1,93 @@
+using System.Collections.Generic;
+
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public static class Actions{
-    public static LayerMask interactiveLayer;
-    public static GameObject targetPrefab;
-    public static GameObject target;
+    public static LayerMask InteractiveLayer;
+    public static GameObject Target;
     public static float cellSize = 1.0f;
-    private static Inventory Backpack = Inventory.Backpack;
-    private static Character Player = GameController.Instance.Player;
-    public static UnityProjectile ShotProjectile;
+    public static List<UnityProjectile> ShotProjectiles;
 
-
-    public static void ShootProjectile(Character shooter){
-        ShotProjectile = (Projectile) Backpack.StoredItems[Backpack.EquippedItemIndex];
-        ShotProjectileObject = new GameObject("ShotProjectile");
-        SpriteRenderer ShotProjectileSpriteRenderer = ShotProjectileObject.AddComponent<SpriteRenderer>();
-        Rigidbody ShotProjectileRigidbody = ShotProjectileObject.AddComponent<Rigidbody>();
-        ShotProjectileRigidbody.useGravity = false;
-        Sprite ShotProjectileSprite = Sprite.Create(ProjectileTexture, new Rect(0, 0, 128.0f, 256.0f), new Vector2(0.5f, 0.5f), 256.0f);
-        ShotProjectileSpriteRenderer.sprite = ShotProjectileSprite;
-        ShotProjectileSpriteRenderer.sortingLayerName = "Player";
-        int projectileShiftX = 0, projectileShiftY = 0, projectileShiftZ = 0;
-        float projectileVelocityX = 0.0f, projectileVelocityY = 0.0f, projectileVelocityZ = 0.0f;
-        if (Player.Direction == 'D'){
-            projectileVelocityZ = -24.0f;
-        } else if (Player.Direction == 'U'){
-            projectileVelocityZ = 24.0f;
-        } else if (Player.Direction == 'L'){
-            projectileVelocityX = -24.0f;
-        } else if (Player.Direction == 'R'){
-            projectileVelocityX = 24.0f;
-        }
-        ShotProjectileObject.transform.position = new Vector3(shooter.Rigidbody.position.x + projectileShiftX, shooter.Rigidbody.position.y + projectileShiftY, shooter.Rigidbody.position.z + projectileShiftZ);
-        ShotProjectileRigidbody.velocity = new Vector3(projectileVelocityX, projectileVelocityY, projectileVelocityZ);
-        ShotProjectileStart = ShotProjectileObject.transform.position;            
-    }
-
-    void findTarget(){
-        if (target == null){
-            target = Instantiate(targetPrefab);
+    public static void FindTarget(){
+        if (Target == null){
+            Target = GameObject.Instantiate(Resources.Load<GameObject>("Target"));
         }
         float targetX, targetY, targetZ;
         targetY = 0.04f;
-        if (Player.Direction == 'D'){
-            targetX = (float) System.Math.Floor(Player.Rigidbody.position.x / cellSize) * cellSize + cellSize;
-            targetZ = (float) System.Math.Floor(Player.Rigidbody.position.z / cellSize) * cellSize - cellSize;
-        } else if (Player.Direction == 'U'){
-            targetX = (float) System.Math.Floor(Player.Rigidbody.position.x / cellSize) * cellSize + cellSize;
-            targetZ = (float) System.Math.Ceiling(Player.Rigidbody.position.z / cellSize) * cellSize + cellSize;
-        } else if (Player.Direction == 'L'){
-            targetX = (float) System.Math.Floor(Player.Rigidbody.position.x / cellSize) * cellSize - cellSize;
-            targetZ = (float) System.Math.Floor(Player.Rigidbody.position.z / cellSize) * cellSize + cellSize;
+        if (GameController.Instance.Player.Rigidbody.rotation.z < 90){
+            targetX = (float) System.Math.Floor(GameController.Instance.Player.Rigidbody.position.x / cellSize) * cellSize + cellSize;
+            targetZ = (float) System.Math.Floor(GameController.Instance.Player.Rigidbody.position.z / cellSize) * cellSize - cellSize;
+        } else if (GameController.Instance.Player.Rigidbody.rotation.z < 180){
+            targetX = (float) System.Math.Floor(GameController.Instance.Player.Rigidbody.position.x / cellSize) * cellSize - cellSize;
+            targetZ = (float) System.Math.Floor(GameController.Instance.Player.Rigidbody.position.z / cellSize) * cellSize + cellSize;
+        } else if (GameController.Instance.Player.Rigidbody.rotation.z < 270){
+            targetX = (float) System.Math.Floor(GameController.Instance.Player.Rigidbody.position.x / cellSize) * cellSize + cellSize;
+            targetZ = (float) System.Math.Ceiling(GameController.Instance.Player.Rigidbody.position.z / cellSize) * cellSize + cellSize;
         } else {
-            targetX = (float) System.Math.Ceiling(Player.Rigidbody.position.x / cellSize) * cellSize + cellSize;
-            targetZ = (float) System.Math.Floor(Player.Rigidbody.position.z / cellSize) * cellSize + cellSize;
+            targetX = (float) System.Math.Ceiling(GameController.Instance.Player.Rigidbody.position.x / cellSize) * cellSize + cellSize;
+            targetZ = (float) System.Math.Floor(GameController.Instance.Player.Rigidbody.position.z / cellSize) * cellSize + cellSize;
         }
-        target.transform.position = new Vector3(targetX,targetY,targetZ);
+        Target.transform.position = new Vector3(targetX,targetY,targetZ);
     }
 
-    public static void UseTool(Character worker, GameObject collidedObject){
-        Tool UsedTool = (Tool) Backpack.StoredItems[Backpack.EquippedItemIndex];
+    public static void UseTool(GameObject collidedObject){
+        Tool UsedTool = (Tool) Inventory.StoredItems[Inventory.EquippedItemIndex];
         ToolFunctions UsedToolFunction = UsedTool.Function;
-        Collider[] hitColliders = Physics.OverlapBox(target.transform.position, new Vector3(0.1f,0.1f,0.1f), Quaternion.identity, interactiveLayer);
+        Collider[] hitColliders = Physics.OverlapBox(Target.transform.position, new Vector3(0.1f,0.1f,0.1f), Quaternion.identity, InteractiveLayer);
         GameObject hitCollider = null;
         if (hitColliders.Length > 0){
             hitCollider = hitColliders[0].gameObject;
         }
         if (hitCollider == null){
             if (UsedToolFunction.Equals(ToolFunctions.WATER)){
-                GameObject prepared = Instantiate(Prepared);
-                prepared.transform.position = target.transform.position;
-                placedObjects.Add(new AlteredObject(Prepared.name, SceneManager.GetActiveScene(), prepared.transform.position, prepared.GetHashCode()));
+                GameObject Prepared = GameObject.Instantiate(Resources.Load<GameObject>("Prepared"));
+                Prepared.transform.position = Target.transform.position;
+                Saves.GameData.AlteredObjects.Add(new AlteredObject(Prepared.name, SceneManager.GetActiveScene(), Prepared.transform.position, Prepared.GetHashCode()));
             }
         } else {
             if (UsedToolFunction.Equals(ToolFunctions.SEED) && hitCollider.tag == "Prepared"){
                 GameObject.Destroy(hitCollider);
-                GameObject placed = Instantiate(Placed);
-                placed.transform.position = target.transform.position;
-                placedObjects.Add(new AlteredObject(Placed.name, SceneManager.GetActiveScene(), placed.transform.position, placed.GetHashCode()));
+                GameObject Placed = GameObject.Instantiate(Resources.Load<GameObject>("Placed"));
+                Placed.transform.position = Target.transform.position;
+                Saves.GameData.AlteredObjects.Add(new AlteredObject(Placed.name, SceneManager.GetActiveScene(), Placed.transform.position, Placed.GetHashCode()));
                 if (UsedTool.Durability > 1){
                     UsedTool.Durability -= 1;
                 } else {
-                    Backpack.StoredItems.Remove(UsedTool);
-                    Backpack.EquippedItemIndex = 0;
+                    Inventory.StoredItems.Remove(UsedTool);
+                    Inventory.EquippedItemIndex = 0;
                 }
-            } else if (Backpack.MaxCapacity > Backpack.StoredItems.Count){
+            } else if (Inventory.MaxCapacity > Inventory.StoredItems.Count){
                 if (UsedToolFunction.Equals(ToolFunctions.SHOVEL) && hitCollider.tag == "Placed"){
                     GameObject.Destroy(hitCollider);
-                    placedObjects.Remove(placedObjects.Find(x => x.Identifier.Equals(hitCollider.GetHashCode())));
-                    if (Backpack.StoredItems.Contains(Tool.Seed)){
-                        Tool collectedSeed = (Tool) Backpack.StoredItems.Find(x => x.Equals(Tool.Seed));
+                    Saves.GameData.AlteredObjects.Remove(Saves.GameData.AlteredObjects.Find(x => x.Identifier.Equals(hitCollider.GetHashCode())));
+                    if (Inventory.StoredItems.Contains(ItemList.Seed)){
+                        Tool collectedSeed = (Tool) Inventory.StoredItems.Find(x => x.Equals(ItemList.Seed));
                         collectedSeed.Durability += 1;
                     } else {
-                        Backpack.StoredItems.Add(Tool.Seed);
+                        Inventory.StoredItems.Add(ItemList.Seed);
                     }
-                } else if (UsedToolFunction.Equals(ToolFunctions.SHOVEL) && Backpack.MaxCapacity >= Backpack.StoredItems.Count + Food.Plant.Strength  && hitCollider.tag == "Ready"){
+                } else if (UsedToolFunction.Equals(ToolFunctions.SHOVEL) && Inventory.MaxCapacity >= Inventory.StoredItems.Count + ItemList.Plant.Strength  && hitCollider.tag == "Ready"){
                     GameObject.Destroy(hitCollider);
-                    placedObjects.Remove(placedObjects.Find(x => x.Identifier.Equals(hitCollider.GetHashCode())));
-                    for (int i = 0; i < Food.Plant.Strength; i++){
-                        Backpack.StoredItems.Add(Food.Plant);
+                    Saves.GameData.AlteredObjects.Remove(Saves.GameData.AlteredObjects.Find(x => x.Identifier.Equals(hitCollider.GetHashCode())));
+                    for (int i = 0; i < ItemList.Plant.Strength; i++){
+                        Inventory.StoredItems.Add(ItemList.Plant);
                     }
-                } else if (hitCollider.tag == "Rock" && UsedToolFunction.Equals(ToolFunctions.PICKAXE) && Input.GetKey(Controls.UseItem))){
+                } else if (hitCollider.tag == "Rock" && UsedToolFunction.Equals(ToolFunctions.PICKAXE) && Input.GetKey(Controls.UseItem)){
                     GameObject.Destroy(hitCollider);
-                    Backpack.StoredItems.Add(Item.Stone);
-                } else if (hitCollider.tag == "Tree" && UsedToolFunction.Equals(ToolFunctions.AXE) && Input.GetKey(Controls.UseItem))){
+                    Inventory.StoredItems.Add(ItemList.Stone);
+                } else if (hitCollider.tag == "Tree" && UsedToolFunction.Equals(ToolFunctions.AXE) && Input.GetKey(Controls.UseItem)){
                     GameObject.Destroy(hitCollider);
-                    Backpack.StoredItems.Add(Item.Wood);
+                    Inventory.StoredItems.Add(ItemList.Wood);
                 }
             }
         }
+    }
+
+    public static void ShootProjectile(UnityCharacter shooter){
+        UnityProjectile projectile = new UnityProjectile("Projectile");
+        projectile.Origin = shooter.Rigidbody.position;
+        projectile.Rigidbody.transform.position = projectile.Origin;
+        projectile.Rigidbody.AddForce(projectile.Rigidbody.transform.forward * 20, ForceMode.Impulse);
     }
 }

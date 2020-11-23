@@ -8,6 +8,8 @@ public static class World{
     public static List<UnityGate> GateList;
     public static List<UnityMapItem> MapItemList;
     public static List<UnityCharacter> CharacterList;
+    public static List<GameObject> TreeList;
+    public static List<GameObject> RockList;
 
     public static void BuildScenes(){
         SceneList.Add(1, "1_home");
@@ -15,64 +17,40 @@ public static class World{
     }
 
     public static void FindCharacters(){
-        Player = new Character();
-        Player.Object = GameObject.FindWithTag("Player");
-        Player.Rigidbody = Player.Object.GetComponent<Rigidbody>();
-        Player.Collider = Player.Object.GetComponent<Collider>();
-        Player.Type.Add(CharacterTypes.Player);
-
-        if (GameObject.FindGameObjectsWithTag("Character").Length > 0){
-            CharacterArray = GameObject.FindGameObjectsWithTag("Character");
-            foreach (GameObject charObject in CharacterArray){
-                Character newChar = new Character();
-                newChar.Object = charObject;
-                newChar.Rigidbody = newChar.Object.GetComponent<Rigidbody>();
-                newChar.Collider = newChar.Object.GetComponent<Collider>();
-                newChar.Type.Add(CharacterTypes.CHARACTER);
-            }
+        foreach (GameObject character in GameObject.FindGameObjectsWithTag("Character")){
+            UnityCharacter newCharacter = new UnityCharacter(character.name);
         }
     }
 
     public static void FindObjects(){
-        Rocks = new List<GameObject>();
-        Trees = new List<GameObject>();
-
-        if (GameObject.FindGameObjectsWithTag("Rock").Length > 0){
-            GameObject[] rockArray = GameObject.FindGameObjectsWithTag("Rock");
-            foreach (GameObject rock in rockArray){
-                Rocks.Add(rock);
-            }
+        foreach (GameObject rock in GameObject.FindGameObjectsWithTag("Rock")){
+            TreeList.Add(rock);
         }
-
-        if (GameObject.FindGameObjectsWithTag("Tree").Length > 0){
-            GameObject[] treeArray = GameObject.FindGameObjectsWithTag("Tree");
-            foreach (GameObject tree in treeArray){
-                Trees.Add(tree);
-            }
+        foreach (GameObject tree in GameObject.FindGameObjectsWithTag("Tree")){
+            TreeList.Add(tree);
         }
     }
 
     public static void FastTravel(int sceneNumber){
-        //if (farthestScene >= sceneNumber && currentScene != sceneNumber){ TODO: Reactivate after testing
-            currentScene = sceneNumber;
+        if (Saves.GameData.FarthestLocation >= sceneNumber && Saves.GameData.CurrentLocation != sceneNumber){ 
+            Saves.GameData.CurrentLocation = sceneNumber;
             SceneManager.LoadScene(SceneList[sceneNumber], LoadSceneMode.Single);
             string savedItems = "";
-            foreach (Item i in Backpack.StoredItems){
+            foreach (Item i in Inventory.StoredItems){
                 savedItems += i.Name + ";";
             }
-            gameData = new Saves.SaveData(gameDayNumber, gameTime, farthestScene, currentScene, savedItems, placedObjects);
-            Saves.SaveGame(gameData);
-        //}
+            Saves.GameData.InventoryItems = savedItems;
+            Saves.SaveGame(Saves.GameData);
+        }
     }
 
     
   
 
     public static void FindGates(){
-        GateList = new List<Gate>();
         foreach (GameObject gate in GameObject.FindGameObjectsWithTag("Gate")){
             Collider gateCollider = gate.GetComponent<Collider>();
-            Gate newGate = new Gate();
+            UnityGate newGate = new UnityGate("gatePrefab");
             newGate.Destination = int.Parse(gate.name.Substring(gate.name.Length - 1));
             newGate.Object = gate;
             newGate.Collider = gateCollider;

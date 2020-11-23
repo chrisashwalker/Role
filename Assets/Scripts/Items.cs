@@ -177,7 +177,7 @@ public sealed class Inventory : IPointerClickHandler{
         }
     }
 
-    void ItemUseCheck(){
+    public static void ItemUseCheck(){
         int itemShift = 0;
         if (Input.GetKeyDown(Controls.ScrollLeft)){
             itemShift = -1;
@@ -195,7 +195,7 @@ public sealed class Inventory : IPointerClickHandler{
             UpdateToggles();
         }
         if (Input.GetKeyDown(Controls.UseItem)){
-            if (StoredItems[EquippedItemIndex].Type.Equals(ItemTypes.PROJECTILE) && Actions.ShotProjectile == null){
+            if (StoredItems[EquippedItemIndex].Type.Equals(ItemTypes.PROJECTILE)){
                 Actions.ShootProjectile(GameController.Instance.Player);
             }
             UpdateToggles();     

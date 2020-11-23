@@ -3,13 +3,13 @@ using UnityEngine;
 public static class TimeManager{
     public static int gameDay;
     public static float gameTime;
-    public static float dayLength;
-    public static float maxLightIntensity;
+    public static float dayLength = 600.0f;
+    public static float maxLightIntensity = 4.0f;
     public static float sunlightTime;
-    public static float sunlightRate;
-    public static float sunrise;
-    public static float sunset;
-    public static Light Sunlight;
+    public static float sunrise = dayLength / 4;
+    public static float sunset = dayLength / 4 * 3;
+    public static float sunlightRate = maxLightIntensity / sunrise;
+    public static Light Sunlight = GameObject.FindWithTag("Sunlight").GetComponent<Light>();
 
     public static void ClockTick(){
         gameTime += Time.deltaTime;
