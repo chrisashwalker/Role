@@ -4,10 +4,10 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public static class Actions{
-    public static LayerMask InteractiveLayer;
-    public static GameObject Target;
-    public static float cellSize = 1.0f;
-    public static List<UnityProjectile> ShotProjectiles;
+    public static LayerMask InteractiveLayer{get;} = LayerMask.GetMask("Interactable");
+    public static GameObject Target{get;set;}
+    public static float cellSize{get;} = 1.0f;
+    public static List<UnityProjectile> ShotProjectiles{get;set;} = new List<UnityProjectile>();
 
     public static void FindTarget(){
         if (Target == null){
@@ -86,6 +86,7 @@ public static class Actions{
 
     public static void ShootProjectile(UnityCharacter shooter){
         UnityProjectile projectile = new UnityProjectile("Projectile");
+        ShotProjectiles.Add(projectile);
         projectile.Origin = shooter.Rigidbody.position;
         projectile.Rigidbody.transform.position = projectile.Origin;
         projectile.Rigidbody.AddForce(projectile.Rigidbody.transform.forward * 20, ForceMode.Impulse);

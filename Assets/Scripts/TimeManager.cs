@@ -1,15 +1,15 @@
 using UnityEngine;
 
 public static class TimeManager{
-    public static int gameDay;
-    public static float gameTime;
-    public static float dayLength = 600.0f;
-    public static float maxLightIntensity = 4.0f;
-    public static float sunlightTime;
-    public static float sunrise = dayLength / 4;
-    public static float sunset = dayLength / 4 * 3;
-    public static float sunlightRate = maxLightIntensity / sunrise;
-    public static Light Sunlight = GameObject.FindWithTag("Sunlight").GetComponent<Light>();
+    public static int gameDay{get;set;}
+    public static float gameTime{get;set;}
+    public static float dayLength{get;} = 600.0f;
+    public static float maxLightIntensity{get;} = 4.0f;
+    public static float sunlightTime{get;set;}
+    public static float sunrise{get;} = dayLength / 4;
+    public static float sunset{get;} = dayLength / 4 * 3;
+    public static float sunlightRate{get;} = maxLightIntensity / sunrise;
+    public static Light Sunlight{get;} = GameObject.FindWithTag("Sunlight").GetComponent<Light>();
 
     public static void ClockTick(){
         gameTime += Time.deltaTime;

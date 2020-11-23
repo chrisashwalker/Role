@@ -1,9 +1,9 @@
 using UnityEngine;
 
 public static class CameraManager{
-    public static Camera MainCamera = GameObject.FindWithTag("MainCamera").GetComponent<Camera>();
-    public static float standardCameraSize = MainCamera.orthographicSize;
-    public static bool cameraIsStandardSized = true;
+    public static Camera MainCamera{get;} = GameObject.FindWithTag("MainCamera").GetComponent<Camera>();
+    public static float standardCameraSize{get;} = MainCamera.orthographicSize;
+    public static bool cameraIsStandardSized{get;set;} = true;
 
     public static void MapToggle(){
         if (cameraIsStandardSized){

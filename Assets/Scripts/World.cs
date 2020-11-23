@@ -4,12 +4,12 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public static class World{
-    public static Dictionary<int, string> SceneList;
-    public static List<UnityGate> GateList;
-    public static List<UnityMapItem> MapItemList;
-    public static List<UnityCharacter> CharacterList;
-    public static List<GameObject> TreeList;
-    public static List<GameObject> RockList;
+    public static Dictionary<int, string> SceneList{get;set;} = new Dictionary<int, string>();
+    public static List<UnityGate> GateList{get;set;} = new List<UnityGate>();
+    public static List<UnityMapItem> MapItemList{get;set;} = new List<UnityMapItem>();
+    public static List<UnityCharacter> CharacterList{get;set;} = new List<UnityCharacter>();
+    public static List<GameObject> TreeList{get;set;} = new List<GameObject>();
+    public static List<GameObject> RockList{get;set;} = new List<GameObject>();
 
     public static void BuildScenes(){
         SceneList.Add(1, "1_home");
@@ -17,8 +17,9 @@ public static class World{
     }
 
     public static void FindCharacters(){
+        GameController.Instance.Player = new UnityCharacter(GameObject.FindGameObjectWithTag("Player"));
         foreach (GameObject character in GameObject.FindGameObjectsWithTag("Character")){
-            UnityCharacter newCharacter = new UnityCharacter(character.name);
+            UnityCharacter newCharacter = new UnityCharacter(character);
         }
     }
 

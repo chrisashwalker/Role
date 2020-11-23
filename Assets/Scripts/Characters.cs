@@ -34,8 +34,8 @@ public class UnityCharacter : Character{
     public Collider Collider{get;set;}
     public int Identifier{get;set;}
 
-    public UnityCharacter(string setName){
-        Object = (GameObject) GameObject.Instantiate(Resources.Load(setName, typeof(GameObject)));
+    public UnityCharacter(GameObject go){
+        Object = go;
         Name = Object.name;
         Rigidbody = Object.GetComponent<Rigidbody>();
         Collider = Object.GetComponent<Collider>();
