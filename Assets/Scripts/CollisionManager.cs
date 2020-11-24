@@ -2,11 +2,12 @@
 using UnityEngine.SceneManagement;
 
 public class CollisionManager : MonoBehaviour{
+    public static GameObject CollidedObject;
     private void OnCollisionStay(Collision collision){
-        CollisionCheck(collision);
+        CollidedObject = CollisionCheck(collision);
     }
 
-    private void CollisionCheck(Collision collision){
+    private GameObject CollisionCheck(Collision collision){
         UnityCharacter character = null; 
         foreach (UnityCharacter uc in World.CharacterList){
             if (uc.Collider == this.GetComponent<Collider>()){
@@ -27,6 +28,7 @@ public class CollisionManager : MonoBehaviour{
                     }
                     Saves.GameData = new Saves.SaveData(Saves.GameData.GameDay, Saves.GameData.GameTime, Saves.GameData.FarthestLocation, Saves.GameData.CurrentLocation, savedItems, Saves.GameData.AlteredObjects);
                     Saves.SaveGame(Saves.GameData);
+                    return null;
                 }
             }
             foreach (UnityMapItem mapItem in World.MapItemList){
@@ -34,22 +36,26 @@ public class CollisionManager : MonoBehaviour{
                     Destroy(mapItem.Object);
                     Inventory.StoredItems.Add(mapItem.linkedItem);
                     Inventory.UpdateToggles();
+                    return null;
                 }
             }
             if (World.TreeList.Count > 0){
                 foreach (GameObject rock in World.RockList){
                     if (rock.GetComponent<Collider>() == collision.collider){
-                        Actions.UseTool(rock);
+                        return rock;
                     }
                 }
             }
             if (World.TreeList.Count > 0){
                 foreach (GameObject tree in World.TreeList){
                     if (tree.GetComponent<Collider>() == collision.collider){
-                        Actions.UseTool(tree);
+                        return tree;
                     }
                 }
             }
+            return null;
+        } else {
+            return null;
         }
     }
 }

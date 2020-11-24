@@ -15,18 +15,18 @@ public static class Actions{
         }
         float targetX, targetY, targetZ;
         targetY = 0.04f;
-        if (GameController.Instance.Player.Rigidbody.rotation.y < 0){
-            targetX = (float) System.Math.Ceiling(GameController.Instance.Player.Rigidbody.position.x / cellSize) * cellSize + cellSize;
-            targetZ = (float) System.Math.Floor(GameController.Instance.Player.Rigidbody.position.z / cellSize) * cellSize + cellSize;
-        } else if (GameController.Instance.Player.Rigidbody.rotation.y < 90){
+        if (GameController.Instance.Player.Rigidbody.rotation.eulerAngles.y < 90){
             targetX = (float) System.Math.Floor(GameController.Instance.Player.Rigidbody.position.x / cellSize) * cellSize + cellSize;
             targetZ = (float) System.Math.Floor(GameController.Instance.Player.Rigidbody.position.z / cellSize) * cellSize - cellSize;
-        } else if (GameController.Instance.Player.Rigidbody.rotation.y < 180){
+        } else if (GameController.Instance.Player.Rigidbody.rotation.eulerAngles.y < 180){
             targetX = (float) System.Math.Floor(GameController.Instance.Player.Rigidbody.position.x / cellSize) * cellSize - cellSize;
             targetZ = (float) System.Math.Floor(GameController.Instance.Player.Rigidbody.position.z / cellSize) * cellSize + cellSize;
-        } else {
+        } else if  (GameController.Instance.Player.Rigidbody.rotation.eulerAngles.y < 270){
             targetX = (float) System.Math.Floor(GameController.Instance.Player.Rigidbody.position.x / cellSize) * cellSize + cellSize;
             targetZ = (float) System.Math.Ceiling(GameController.Instance.Player.Rigidbody.position.z / cellSize) * cellSize + cellSize;
+        } else {
+            targetX = (float) System.Math.Ceiling(GameController.Instance.Player.Rigidbody.position.x / cellSize) * cellSize + cellSize;
+            targetZ = (float) System.Math.Floor(GameController.Instance.Player.Rigidbody.position.z / cellSize) * cellSize + cellSize;
         }
         Target.transform.position = new Vector3(targetX,targetY,targetZ);
         Target.transform.rotation = GameController.Instance.Player.Rigidbody.rotation;

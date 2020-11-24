@@ -197,6 +197,8 @@ public sealed class Inventory : IPointerClickHandler{
         if (Input.GetKeyDown(Controls.UseItem)){
             if (StoredItems[EquippedItemIndex].Type.Equals(ItemTypes.PROJECTILE)){
                 Actions.ShootProjectile(GameController.Instance.Player);
+            } else if (StoredItems[EquippedItemIndex].Type.Equals(ItemTypes.TOOL)){
+                Actions.UseTool(CollisionManager.CollidedObject);
             }
             UpdateToggles();     
         }

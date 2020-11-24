@@ -55,7 +55,11 @@ public class GameController : MonoBehaviour{
         Controls.MoveCharacter(Player);
         CameraManager.CameraFollow();
         Actions.FindTarget();
-         if (Input.GetKeyDown(Controls.MapZoom)){
+    }
+
+    void Update(){
+        TimeManager.ClockTick();
+        if (Input.GetKeyDown(Controls.MapZoom)){
             CameraManager.MapToggle();
         } else if (Input.GetKeyDown(KeyCode.Alpha1)){
             World.FastTravel(1);
@@ -69,9 +73,5 @@ public class GameController : MonoBehaviour{
                 Actions.ShotProjectiles.Remove(projectile);
             }
         }
-    }
-
-    void Update(){
-        TimeManager.ClockTick();
     }
 }
