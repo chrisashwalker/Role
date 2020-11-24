@@ -30,6 +30,7 @@ public class GameController : MonoBehaviour{
             }
             Saves.GameData.AlteredObjects = Saves.GameData.AlteredObjects;
         } else {
+            Saves.GameData = new Saves.SaveData();
             Saves.GameData.GameDay = 1;
             Saves.GameData.GameTime = 0.0f;
             Saves.GameData.FarthestLocation = 1;
@@ -52,6 +53,7 @@ public class GameController : MonoBehaviour{
 
     void FixedUpdate(){
         Controls.MoveCharacter(Player);
+        CameraManager.CameraFollow();
         Actions.FindTarget();
          if (Input.GetKeyDown(Controls.MapZoom)){
             CameraManager.MapToggle();

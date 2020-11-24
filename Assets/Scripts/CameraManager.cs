@@ -5,6 +5,10 @@ public static class CameraManager{
     public static float standardCameraSize{get;} = MainCamera.orthographicSize;
     public static bool cameraIsStandardSized{get;set;} = true;
 
+    public static void CameraFollow(){
+        MainCamera.transform.position = new Vector3(GameController.Instance.Player.Rigidbody.position.x, GameController.Instance.Player.Rigidbody.position.y + 2.0f, GameController.Instance.Player.Rigidbody.position.z - 5.0f);
+    }
+
     public static void MapToggle(){
         if (cameraIsStandardSized){
             MainCamera.orthographicSize = standardCameraSize * 10;
@@ -12,6 +16,6 @@ public static class CameraManager{
             } else {
             MainCamera.orthographicSize = standardCameraSize;
             cameraIsStandardSized = true;
-            }
+        }
     }
 }

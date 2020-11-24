@@ -31,7 +31,7 @@ public static class Saves{
         }
     }
 
-    public static SaveData GameData{get;set;} = new SaveData();
+    public static SaveData GameData{get;set;}
 
     public static void SaveGame(SaveData data){
         BinaryFormatter formatter = new BinaryFormatter();
