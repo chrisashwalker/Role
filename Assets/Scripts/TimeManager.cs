@@ -9,7 +9,7 @@ public static class TimeManager{
     public static float sunrise{get;} = dayLength / 4;
     public static float sunset{get;} = dayLength / 4 * 3;
     public static float sunlightRate{get;} = maxLightIntensity / sunrise;
-    public static Light Sunlight{get;} = GameObject.FindWithTag("Sunlight").GetComponent<Light>();
+    public static Light Sunlight{get;set;}
 
     public static void ClockTick(){
         gameTime += Time.deltaTime;
@@ -21,6 +21,9 @@ public static class TimeManager{
         }
         if (gameTime >= dayLength){
             gameDay += 1;
+            foreach (AlteredObject ao in Saves.GameData.AlteredObjects){
+                ao.DaysAltered += 1;
+            }
             gameTime = 0.0f;
             Debug.Log("It's Day " + gameDay);
         }

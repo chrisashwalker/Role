@@ -2,7 +2,6 @@ using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 
 public enum ItemTypes{
     ITEM,
@@ -89,8 +88,7 @@ public sealed class ItemList{
     public static Food Plant = new Food(setName:"Plant", setCondition:2);
 }
 
-public sealed class Inventory : IPointerClickHandler{
-
+public static class Inventory{
     public static int MaxCapacity{get;set;} = 10;
     public static List<Item> StoredItems{get;set;}  = new List<Item>();
     public static int EquippedItemIndex{get;set;} = 0;
@@ -168,13 +166,6 @@ public sealed class Inventory : IPointerClickHandler{
             }
         }
         UpdateToggles();
-    }
-
-    public void OnPointerClick(PointerEventData pointerEventData){
-        GameObject clickedToggle = pointerEventData.pointerPress;
-        if (clickedToggle.tag == "ItemToggle"){
-            Inventory.Equip(clickedToggle);
-        }
     }
 
     public static void ItemUseCheck(){

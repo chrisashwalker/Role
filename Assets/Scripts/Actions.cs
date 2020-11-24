@@ -4,10 +4,11 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public static class Actions{
-    public static LayerMask InteractiveLayer{get;} = LayerMask.GetMask("Interactable");
+    public static LayerMask InteractiveLayer{get;set;}
     public static GameObject Target{get;set;}
     public static float cellSize{get;} = 1.0f;
     public static List<UnityProjectile> ShotProjectiles{get;set;} = new List<UnityProjectile>();
+    public static List<UnityProjectile> SpentProjectiles{get;set;} = new List<UnityProjectile>();
 
     public static void FindTarget(){
         if (Target == null){
@@ -44,14 +45,14 @@ public static class Actions{
             if (UsedToolFunction.Equals(ToolFunctions.WATER)){
                 GameObject Prepared = GameObject.Instantiate(Resources.Load<GameObject>("Prepared"));
                 Prepared.transform.position = Target.transform.position;
-                Saves.GameData.AlteredObjects.Add(new AlteredObject(Prepared.name, SceneManager.GetActiveScene(), Prepared.transform.position, Prepared.GetHashCode()));
+                Saves.GameData.AlteredObjects.Add(new AlteredObject("Addition", Prepared.name, SceneManager.GetActiveScene(), Prepared.transform.position, Prepared.GetInstanceID()));
             }
         } else {
             if (UsedToolFunction.Equals(ToolFunctions.SEED) && hitCollider.tag == "Prepared"){
                 GameObject.Destroy(hitCollider);
                 GameObject Placed = GameObject.Instantiate(Resources.Load<GameObject>("Placed"));
                 Placed.transform.position = Target.transform.position;
-                Saves.GameData.AlteredObjects.Add(new AlteredObject(Placed.name, SceneManager.GetActiveScene(), Placed.transform.position, Placed.GetHashCode()));
+                Saves.GameData.AlteredObjects.Add(new AlteredObject("Addition", Placed.name, SceneManager.GetActiveScene(), Placed.transform.position, Placed.GetInstanceID()));
                 if (UsedTool.Durability > 1){
                     UsedTool.Durability -= 1;
                 } else {
@@ -61,7 +62,7 @@ public static class Actions{
             } else if (Inventory.MaxCapacity > Inventory.StoredItems.Count){
                 if (UsedToolFunction.Equals(ToolFunctions.SHOVEL) && hitCollider.tag == "Placed"){
                     GameObject.Destroy(hitCollider);
-                    Saves.GameData.AlteredObjects.Remove(Saves.GameData.AlteredObjects.Find(x => x.Identifier.Equals(hitCollider.GetHashCode())));
+                    Saves.GameData.AlteredObjects.Remove(Saves.GameData.AlteredObjects.Find(x => x.Identifier.Equals(hitCollider.GetInstanceID())));
                     if (Inventory.StoredItems.Contains(ItemList.Seed)){
                         Tool collectedSeed = (Tool) Inventory.StoredItems.Find(x => x.Equals(ItemList.Seed));
                         collectedSeed.Durability += 1;
@@ -70,15 +71,19 @@ public static class Actions{
                     }
                 } else if (UsedToolFunction.Equals(ToolFunctions.SHOVEL) && Inventory.MaxCapacity >= Inventory.StoredItems.Count + ItemList.Plant.Strength  && hitCollider.tag == "Ready"){
                     GameObject.Destroy(hitCollider);
-                    Saves.GameData.AlteredObjects.Remove(Saves.GameData.AlteredObjects.Find(x => x.Identifier.Equals(hitCollider.GetHashCode())));
+                    Saves.GameData.AlteredObjects.Remove(Saves.GameData.AlteredObjects.Find(x => x.Identifier.Equals(hitCollider.GetInstanceID())));
                     for (int i = 0; i < ItemList.Plant.Strength; i++){
                         Inventory.StoredItems.Add(ItemList.Plant);
                     }
                 } else if (hitCollider.tag == "Rock" && UsedToolFunction.Equals(ToolFunctions.PICKAXE) && Input.GetKey(Controls.UseItem)){
+                    Saves.GameData.AlteredObjects.Add(new AlteredObject("Removal", hitCollider.gameObject.name, SceneManager.GetActiveScene(), hitCollider.gameObject.transform.position, hitCollider.gameObject.GetInstanceID()));
                     GameObject.Destroy(hitCollider);
+                    World.RockList.Remove(hitCollider);
                     Inventory.StoredItems.Add(ItemList.Stone);
                 } else if (hitCollider.tag == "Tree" && UsedToolFunction.Equals(ToolFunctions.AXE) && Input.GetKey(Controls.UseItem)){
+                    Saves.GameData.AlteredObjects.Add(new AlteredObject("Removal", hitCollider.gameObject.name, SceneManager.GetActiveScene(), hitCollider.gameObject.transform.position, hitCollider.gameObject.GetInstanceID()));
                     GameObject.Destroy(hitCollider);
+                    World.TreeList.Remove(hitCollider);
                     Inventory.StoredItems.Add(ItemList.Wood);
                 }
             }
@@ -88,8 +93,28 @@ public static class Actions{
     public static void ShootProjectile(UnityCharacter shooter){
         UnityProjectile projectile = new UnityProjectile("Projectile");
         ShotProjectiles.Add(projectile);
-        projectile.Origin = shooter.Rigidbody.position;
+        float offsetX, offsetZ;
+        Vector3 direction;
+        float speed = 10f;
+        if (GameController.Instance.Player.Rigidbody.rotation.eulerAngles.y < 90){
+            offsetX = 0f;
+            offsetZ = -1f;
+            direction = Vector3.back;
+        } else if (GameController.Instance.Player.Rigidbody.rotation.eulerAngles.y < 180){
+            offsetX = -1f;
+            offsetZ = 0f;
+            direction = Vector3.left;
+        } else if  (GameController.Instance.Player.Rigidbody.rotation.eulerAngles.y < 270){
+            offsetX = 0f;
+            offsetZ = 1f;
+            direction = Vector3.forward;
+        } else {
+            offsetX = 1f;
+            offsetZ = 0f;
+            direction = Vector3.right;
+        }
+        projectile.Origin = new Vector3(shooter.Rigidbody.position.x + offsetX, shooter.Rigidbody.position.y, shooter.Rigidbody.position.z + offsetZ);
         projectile.Rigidbody.transform.position = projectile.Origin;
-        projectile.Rigidbody.AddForce(projectile.Rigidbody.transform.forward * 20, ForceMode.Impulse);
+        projectile.Rigidbody.AddForce(direction * speed, ForceMode.Impulse);
     }
 }
