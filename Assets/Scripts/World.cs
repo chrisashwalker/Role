@@ -25,15 +25,19 @@ public static class World{
 
     public static void FindObjects(){
         foreach (GameObject rock in GameObject.FindGameObjectsWithTag("Rock")){
-            TreeList.Add(rock);
+            if (RockList.Contains(rock) == false){
+                RockList.Add(rock);
+            }
         }
         foreach (GameObject tree in GameObject.FindGameObjectsWithTag("Tree")){
-            TreeList.Add(tree);
+            if (TreeList.Contains(tree) == false){
+                TreeList.Add(tree);
+            }
         }
     }
 
     public static void FastTravel(int sceneNumber){
-        if (Saves.GameData.FarthestLocation >= sceneNumber && Saves.GameData.CurrentLocation != sceneNumber){ 
+        //if (Saves.GameData.FarthestLocation >= sceneNumber && Saves.GameData.CurrentLocation != sceneNumber){ 
             Saves.GameData.CurrentLocation = sceneNumber;
             SceneManager.LoadScene(SceneList[sceneNumber], LoadSceneMode.Single);
             string savedItems = "";
@@ -42,7 +46,7 @@ public static class World{
             }
             Saves.GameData.InventoryItems = savedItems;
             Saves.SaveGame(Saves.GameData);
-        }
+        //}
     }
 
     
@@ -141,6 +145,7 @@ public class UnityMapItem{
 
 [System.Serializable]
 public class AlteredObject{
+    public string Change{get;set;}
     public string Prefab{get;set;}
     public string Scene{get;set;}
     public float PositionX{get;set;}
@@ -149,8 +154,9 @@ public class AlteredObject{
     public int DaysAltered{get;set;}
     public int Identifier{get;set;}
 
-    public AlteredObject(string setPrefab, Scene setScene, Vector3 setPosition, int setIdentifier, int setDaysAltered = 0){
-        Prefab = setPrefab;
+    public AlteredObject(string setChange, string setPrefab, Scene setScene, Vector3 setPosition, int setIdentifier, int setDaysAltered = 0){
+        Change = setChange;
+        Prefab = setPrefab.Replace("(Clone)","");
         Scene = setScene.name;
         PositionX = setPosition.x;
         PositionY = setPosition.y;

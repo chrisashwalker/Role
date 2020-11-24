@@ -1,8 +1,8 @@
 using UnityEngine;
 
 public static class CameraManager{
-    public static Camera MainCamera{get;} = GameObject.FindWithTag("MainCamera").GetComponent<Camera>();
-    public static float standardCameraSize{get;} = MainCamera.orthographicSize;
+    public static Camera MainCamera{get;set;}
+    public static float standardCameraSize{get;set;}
     public static bool cameraIsStandardSized{get;set;} = true;
 
     public static void CameraFollow(){
