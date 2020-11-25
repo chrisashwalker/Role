@@ -14,15 +14,15 @@ public static class Saves{
         public int CurrentLocation{get;set;}
         public int FarthestLocation{get;set;}
         public float GameTime{get;set;}
-        public string InventoryItems{get;set;}
+        public List<Item> InventoryItems{get;set;}
         public List<AlteredObject> AlteredObjects{get;set;}
 
-        public SaveData(int setDay = 1, float setTime = 0.0f, int setProgress = 1, int setLocation = 1, string setItems = "", List<AlteredObject> setAlteredObjects = null){
+        public SaveData(int setDay = 1, float setTime = 0.0f, int setProgress = 1, int setLocation = 1, List<Item> setInventoryItems = null, List<AlteredObject> setAlteredObjects = null){
             GameDay = setDay;
             GameTime = setTime;
             Progress = setProgress;
             CurrentLocation = setLocation;
-            InventoryItems = setItems;
+            InventoryItems = setInventoryItems;
             if (setAlteredObjects != null){
                 AlteredObjects = setAlteredObjects;
             } else {

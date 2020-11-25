@@ -19,6 +19,7 @@ public enum ToolFunctions{
     SEED
 }
 
+[System.Serializable]
 public class Item{
     public int Identifier{get;set;}
     public ItemTypes Type{get;set;}
@@ -35,6 +36,7 @@ public class Item{
     }
 }
 
+[System.Serializable]
 public class Tool : Item{
     public ToolFunctions Function{get;set;}
     public int Durability{get;set;}
@@ -50,6 +52,7 @@ public class Tool : Item{
     }
 }
 
+[System.Serializable]
 public class Projectile : Item{
     public float Distance{get;set;}
     public int Quantity{get;set;}
@@ -65,6 +68,7 @@ public class Projectile : Item{
     }
 }
 
+[System.Serializable]
 public class Food : Item{
     public int Condition{get;set;}
     public int Quantity{get;set;}
@@ -125,18 +129,16 @@ public static class Inventory{
     public static float toggleWidth = 100.0f;
     public static float toggleHeight = 25.0f;
 
-    // TODO: Improve
     public static void UpdateToggles(){
-        GameObject fullCanvas = GameObject.FindWithTag("FullCanvas");
-        GameObject[] allItemToggles = GameObject.FindGameObjectsWithTag("ItemToggle");
-        foreach (GameObject toggle in allItemToggles){
+        foreach (GameObject toggle in GameController.Instance.AllItemToggles){
             toggle.SetActive(false);
             GameObject.Destroy(toggle);
         }
+        GameController.Instance.AllItemToggles = new GameObject[0];
         foreach (Item item in StoredItems){
             GameObject newToggleObject = GameObject.Instantiate(Resources.Load<GameObject>("ItemToggle"));
             newToggleObject.tag = "ItemToggle";
-            newToggleObject.transform.SetParent(fullCanvas.transform, false);
+            newToggleObject.transform.SetParent(GameController.Instance.FullCanvas.transform, false);
             string itemLabel;
             int itemDurability;
             if (item.Type == ItemTypes.TOOL){
@@ -152,10 +154,10 @@ public static class Inventory{
             }
             newToggleObject.GetComponentInChildren<Text>().text = itemLabel;
         }
-        allItemToggles = GameObject.FindGameObjectsWithTag("ItemToggle");
-        int toggleCount = allItemToggles.Length;
-        foreach (GameObject toggle in allItemToggles){
-            int toggleIndex = System.Array.IndexOf(allItemToggles, toggle);
+        GameController.Instance.AllItemToggles = GameObject.FindGameObjectsWithTag("ItemToggle");
+        int toggleCount = GameController.Instance.AllItemToggles.Length;
+        foreach (GameObject toggle in GameController.Instance.AllItemToggles){
+            int toggleIndex = System.Array.IndexOf(GameController.Instance.AllItemToggles, toggle);
             float positionFromCenter = toggleIndex - ((float) toggleCount / 2) + 0.5f;
             toggle.GetComponent<RectTransform>().anchoredPosition = new Vector2(positionFromCenter * toggleWidth,toggleHeight);
             if (toggleIndex == EquippedItemIndex){
@@ -168,6 +170,7 @@ public static class Inventory{
         foreach (Item item in StoredItems){
             if (clickedToggle.GetComponentInChildren<Text>().text == item.Name){
                 EquippedItemIndex = StoredItems.IndexOf(item);
+                break;
             }
         }
         UpdateToggles();

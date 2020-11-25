@@ -7,6 +7,8 @@ public class GameController : MonoBehaviour{
     public static GameController Instance{get;set;}
     public UnityCharacter Player{get;set;}
     public int RegenDays = 3;
+    public GameObject FullCanvas{get;set;}
+    public GameObject[] AllItemToggles{get;set;}
 
     void Awake(){
         Instance = this;
@@ -17,7 +19,9 @@ public class GameController : MonoBehaviour{
         if (World.SceneList.Count == 0){
             World.BuildScenes();
         }
-        Inventory.LoadGameItems();
+        if (Inventory.GameItemList.Count == 0){
+            Inventory.LoadGameItems();
+        }
         Saves.GameData = Saves.LoadGame();
         if (Saves.GameData != null){
             if (Saves.Loaded == false){
@@ -26,16 +30,7 @@ public class GameController : MonoBehaviour{
                 }
                 Saves.Loaded = true;
             }
-            string savedItems = Saves.GameData.InventoryItems;
-            List<string> SavedItemsList = new List<string>(savedItems.Split(','));
-            if (savedItems == ""){
-                Inventory.LoadStandardItems();
-            } else if (Inventory.StoredItems.Count == 0) {
-                foreach (string itemIdentifier in SavedItemsList){
-                    Inventory.StoredItems.Add(Inventory.GameItemList[int.Parse(itemIdentifier)]);
-                }
-            }
-            Saves.GameData.AlteredObjects = Saves.GameData.AlteredObjects;
+            Inventory.StoredItems = Saves.GameData.InventoryItems;
         } else {
             Saves.GameData = new Saves.SaveData();
             Saves.GameData.GameDay = 1;
@@ -45,11 +40,14 @@ public class GameController : MonoBehaviour{
             Inventory.LoadStandardItems();
         }
         Inventory.EquippedItemIndex = 0;
+        FullCanvas = GameObject.FindWithTag("FullCanvas");
+        AllItemToggles = GameObject.FindGameObjectsWithTag("ItemToggle");
         Inventory.UpdateToggles();
         World.FindCharacters();
-        World.FindGates();
-        World.FindMapItems();
         World.FindObjects();
+    }
+
+    void Start(){
         List<AlteredObject> SpentRemovals = new List<AlteredObject>();
         foreach (AlteredObject po in Saves.GameData.AlteredObjects){
             if (po.Scene == SceneManager.GetActiveScene().name){
@@ -58,8 +56,16 @@ public class GameController : MonoBehaviour{
                 po.Identifier = loadedPo.GetInstanceID();
                 loadedPo.transform.position = new Vector3(po.PositionX, po.PositionY, po.PositionZ);
                 } else if (po.Change == "Removal"){
-                    if (po.DaysAltered < RegenDays){
-                        Vector3 poPosition = new Vector3(po.PositionX, po.PositionY, po.PositionZ);
+                    Vector3 poPosition = new Vector3(po.PositionX, po.PositionY, po.PositionZ);
+                    if (po.Prefab == "MapItem"){
+                        foreach (UnityMapItem mapItem in World.MapItemList){
+                            if (mapItem.Object.transform.position.x == poPosition.x && mapItem.Object.transform.position.z == poPosition.z){
+                                GameObject.Destroy(mapItem.Object);
+                                World.MapItemList.Remove(mapItem);
+                                break;
+                            }
+                        }
+                    } else if (po.DaysAltered < RegenDays){
                         if (po.Prefab == "Tree"){
                             foreach (GameObject tree in World.TreeList){
                                 if (tree.transform.position.x == poPosition.x && tree.transform.position.z == poPosition.z){

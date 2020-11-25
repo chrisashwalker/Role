@@ -20,6 +20,7 @@ public static class World{
         GameController.Instance.Player = new UnityCharacter(GameObject.FindGameObjectWithTag("Player"));
         foreach (GameObject character in GameObject.FindGameObjectsWithTag("Character")){
             UnityCharacter newCharacter = new UnityCharacter(character);
+            CharacterList.Add(newCharacter);
         }
     }
 
@@ -37,43 +38,16 @@ public static class World{
     }
 
     public static void FastTravel(int sceneNumber){
-        //if (Saves.GameData.FarthestLocation >= sceneNumber && Saves.GameData.CurrentLocation != sceneNumber){ 
+        if (Saves.GameData.FarthestLocation >= sceneNumber && Saves.GameData.CurrentLocation != sceneNumber){ 
             Saves.GameData.CurrentLocation = sceneNumber;
+            World.RockList.Clear();
+            World.TreeList.Clear();
+            World.MapItemList.Clear();
             SceneManager.LoadScene(SceneList[sceneNumber], LoadSceneMode.Single);
-            string savedItems = "";
-            foreach (Item i in Inventory.StoredItems){
-                savedItems += i.Identifier + ",";
-            }
-            Saves.GameData.InventoryItems = savedItems;
+            Saves.GameData.InventoryItems = Inventory.StoredItems;
             Saves.SaveGame(Saves.GameData);
-        //}
-    }
-
-    
-  
-
-    public static void FindGates(){
-        foreach (GameObject gate in GameObject.FindGameObjectsWithTag("Gate")){
-            Collider gateCollider = gate.GetComponent<Collider>();
-            UnityGate newGate = new UnityGate("gatePrefab");
-            newGate.Destination = int.Parse(gate.name.Substring(gate.name.Length - 1));
-            newGate.Object = gate;
-            newGate.Collider = gateCollider;
-            GateList.Add(newGate);
         }
     }
-
-    public static void FindMapItems(){
-        foreach (GameObject mapItem in GameObject.FindGameObjectsWithTag("MapItem")){
-            Collider mapItemCollider = mapItem.GetComponent<Collider>();
-            int mapItemIdentifier = int.Parse(mapItem.name.Substring(mapItem.name.Length - 1));
-            UnityMapItem foundItem = new UnityMapItem("mapItemPrefab", Inventory.GameItemList[mapItemIdentifier]);
-            foundItem.Object = mapItem;
-            foundItem.Collider = mapItemCollider;
-            MapItemList.Add(foundItem);
-        }
-    }
-
 }
 
 public enum BarrierTypes{
@@ -121,8 +95,8 @@ public class UnityGate : Gate{
     public Collider Collider{get;set;}
     public int Identifier{get;set;}
 
-    public UnityGate(string gatePrefab){
-        Object = (GameObject) GameObject.Instantiate(Resources.Load(gatePrefab, typeof(GameObject)));
+    public UnityGate(GameObject gate){
+        Object = gate;
         Rigidbody = Object.GetComponent<Rigidbody>();
         Collider = Object.GetComponent<Collider>();
         Identifier = Object.GetInstanceID();
@@ -136,11 +110,12 @@ public class UnityMapItem{
     public int Identifier{get;set;}
     public Item linkedItem{get;set;}
 
-    public UnityMapItem(string mapItemPrefab, Item item){
-        Object = (GameObject) GameObject.Instantiate(Resources.Load(mapItemPrefab, typeof(GameObject)));
+    public UnityMapItem(GameObject mapItem, Item item){
+        Object = mapItem;
         Rigidbody = Object.GetComponent<Rigidbody>();
         Collider = Object.GetComponent<Collider>();
         Identifier = Object.GetInstanceID();
+        linkedItem = item;
     }
 }
 
