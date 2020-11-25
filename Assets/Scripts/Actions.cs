@@ -90,8 +90,8 @@ public static class Actions{
         }
     }
 
-    public static void ShootProjectile(UnityCharacter shooter){
-        UnityProjectile projectile = new UnityProjectile("Projectile");
+    public static void ShootProjectile(UnityCharacter shooter, Item usedItem){
+        UnityProjectile projectile = new UnityProjectile(usedItem.Identifier);
         ShotProjectiles.Add(projectile);
         float offsetX, offsetZ;
         Vector3 direction;

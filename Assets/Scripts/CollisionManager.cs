@@ -24,7 +24,7 @@ public class CollisionManager : MonoBehaviour{
                     SceneManager.LoadScene(World.SceneList[gate.Destination], LoadSceneMode.Single);
                     string savedItems = "";
                     foreach (Item i in Inventory.StoredItems){
-                        savedItems += i.Name + ";";
+                        savedItems += i.Identifier + ",";
                     }
                     Saves.GameData = new Saves.SaveData(Saves.GameData.GameDay, Saves.GameData.GameTime, Saves.GameData.FarthestLocation, Saves.GameData.CurrentLocation, savedItems, Saves.GameData.AlteredObjects);
                     Saves.SaveGame(Saves.GameData);

@@ -42,7 +42,7 @@ public static class World{
             SceneManager.LoadScene(SceneList[sceneNumber], LoadSceneMode.Single);
             string savedItems = "";
             foreach (Item i in Inventory.StoredItems){
-                savedItems += i.Name + ";";
+                savedItems += i.Identifier + ",";
             }
             Saves.GameData.InventoryItems = savedItems;
             Saves.SaveGame(Saves.GameData);
@@ -66,7 +66,8 @@ public static class World{
     public static void FindMapItems(){
         foreach (GameObject mapItem in GameObject.FindGameObjectsWithTag("MapItem")){
             Collider mapItemCollider = mapItem.GetComponent<Collider>();
-            UnityMapItem foundItem = new UnityMapItem("mapItemPrefab", Inventory.GameItemList.Find(x => x.Name == mapItem.name));
+            int mapItemIdentifier = int.Parse(mapItem.name.Substring(mapItem.name.Length - 1));
+            UnityMapItem foundItem = new UnityMapItem("mapItemPrefab", Inventory.GameItemList[mapItemIdentifier]);
             foundItem.Object = mapItem;
             foundItem.Collider = mapItemCollider;
             MapItemList.Add(foundItem);

@@ -27,14 +27,12 @@ public class GameController : MonoBehaviour{
                 Saves.Loaded = true;
             }
             string savedItems = Saves.GameData.InventoryItems;
-            List<string> SavedItemsList = new List<string>(savedItems.Split(';'));
+            List<string> SavedItemsList = new List<string>(savedItems.Split(','));
             if (savedItems == ""){
                 Inventory.LoadStandardItems();
             } else if (Inventory.StoredItems.Count == 0) {
-                foreach (string itemName in SavedItemsList){
-                    if (Inventory.GameItemList.Find(x => x.Name == itemName) != null){
-                        Inventory.StoredItems.Add(Inventory.GameItemList.Find(x => x.Name == itemName));
-                    }
+                foreach (string itemIdentifier in SavedItemsList){
+                    Inventory.StoredItems.Add(Inventory.GameItemList[int.Parse(itemIdentifier)]);
                 }
             }
             Saves.GameData.AlteredObjects = Saves.GameData.AlteredObjects;
