@@ -52,12 +52,17 @@ public class GameController : MonoBehaviour{
         foreach (AlteredObject po in Saves.GameData.AlteredObjects){
             if (po.Scene == SceneManager.GetActiveScene().name){
                 if (po.Change == "Addition"){
-                GameObject loadedPo = Instantiate(Resources.Load(po.Prefab, typeof(GameObject))) as GameObject;
-                po.Identifier = loadedPo.GetInstanceID();
-                loadedPo.transform.position = new Vector3(po.PositionX, po.PositionY, po.PositionZ);
+                    GameObject loadedPo;
+                    if (po.DaysAltered >= RegenDays){
+                        loadedPo = Instantiate(Resources.Load(po.endPrefab, typeof(GameObject))) as GameObject;
+                    } else {
+                    loadedPo = Instantiate(Resources.Load(po.startPrefab, typeof(GameObject))) as GameObject;
+                    }
+                    po.Identifier = loadedPo.GetInstanceID();
+                    loadedPo.transform.position = new Vector3(po.PositionX, po.PositionY, po.PositionZ);
                 } else if (po.Change == "Removal"){
                     Vector3 poPosition = new Vector3(po.PositionX, po.PositionY, po.PositionZ);
-                    if (po.Prefab == "MapItem"){
+                    if (po.startPrefab == "MapItem"){
                         foreach (UnityMapItem mapItem in World.MapItemList){
                             if (mapItem.Object.transform.position.x == poPosition.x && mapItem.Object.transform.position.z == poPosition.z){
                                 GameObject.Destroy(mapItem.Object);
@@ -66,7 +71,7 @@ public class GameController : MonoBehaviour{
                             }
                         }
                     } else if (po.DaysAltered < RegenDays){
-                        if (po.Prefab == "Tree"){
+                        if (po.startPrefab == "Tree"){
                             foreach (GameObject tree in World.TreeList){
                                 if (tree.transform.position.x == poPosition.x && tree.transform.position.z == poPosition.z){
                                     GameObject.Destroy(tree);
@@ -74,7 +79,7 @@ public class GameController : MonoBehaviour{
                                     break;
                                 }
                             }
-                        } else if (po.Prefab == "Rock"){
+                        } else if (po.startPrefab == "Rock"){
                             foreach (GameObject rock in World.RockList){
                                 if (rock.transform.position.x == poPosition.x && rock.transform.position.z == poPosition.z){
                                     GameObject.Destroy(rock);

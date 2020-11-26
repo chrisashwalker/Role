@@ -49,6 +49,7 @@ public static class Actions{
             }
         } else {
             if (UsedToolFunction.Equals(ToolFunctions.SEED) && hitCollider.tag == "Prepared"){
+                Saves.GameData.AlteredObjects.Remove(Saves.GameData.AlteredObjects.Find(x => x.Identifier.Equals(hitCollider.GetInstanceID())));
                 GameObject.Destroy(hitCollider);
                 GameObject Placed = GameObject.Instantiate(Resources.Load<GameObject>("Placed"));
                 Placed.transform.position = Target.transform.position;

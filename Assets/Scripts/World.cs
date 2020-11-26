@@ -25,6 +25,8 @@ public static class World{
     }
 
     public static void FindObjects(){
+        RockList.Clear();
+        TreeList.Clear();
         foreach (GameObject rock in GameObject.FindGameObjectsWithTag("Rock")){
             if (RockList.Contains(rock) == false){
                 RockList.Add(rock);
@@ -122,7 +124,8 @@ public class UnityMapItem{
 [System.Serializable]
 public class AlteredObject{
     public string Change{get;set;}
-    public string Prefab{get;set;}
+    public string startPrefab{get;set;}
+    public string endPrefab{get;set;}
     public string Scene{get;set;}
     public float PositionX{get;set;}
     public float PositionY{get;set;}
@@ -132,7 +135,8 @@ public class AlteredObject{
 
     public AlteredObject(string setChange, string setPrefab, Scene setScene, Vector3 setPosition, int setIdentifier, int setDaysAltered = 0){
         Change = setChange;
-        Prefab = setPrefab.Replace("(Clone)","");
+        startPrefab = setPrefab.Replace("(Clone)","");
+        endPrefab = startPrefab + "End";
         Scene = setScene.name;
         PositionX = setPosition.x;
         PositionY = setPosition.y;

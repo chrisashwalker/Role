@@ -17,13 +17,9 @@ public class CollisionManager : MonoBehaviour{
                 World.RockList.Clear();
                 World.TreeList.Clear();
                 World.MapItemList.Clear();
-                SceneManager.LoadScene(World.SceneList[gate.Destination], LoadSceneMode.Single);
-                string savedItems = "";
-                foreach (Item i in Inventory.StoredItems){
-                    savedItems += i.Identifier + ",";
-                }
-                Saves.GameData = new Saves.SaveData(Saves.GameData.GameDay, Saves.GameData.GameTime, Saves.GameData.FarthestLocation, Saves.GameData.CurrentLocation, Inventory.StoredItems, Saves.GameData.AlteredObjects);
+                Saves.GameData.InventoryItems = Inventory.StoredItems;
                 Saves.SaveGame(Saves.GameData);
+                SceneManager.LoadScene(World.SceneList[gate.Destination], LoadSceneMode.Single);
                 return null;
             }
         }
