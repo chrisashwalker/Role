@@ -95,7 +95,6 @@ public sealed class ItemList{
     public static Food Plant = new Food(setIdentifier:7, setName:"Plant", setCondition:2);
     public static Item Wood = new Item(setIdentifier:8, setName:"Wood");
     public static Item Stone = new Item(setIdentifier:9, setName:"Stone");
-
 }
 
 public static class Inventory{
