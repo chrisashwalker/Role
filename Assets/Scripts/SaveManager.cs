@@ -16,8 +16,9 @@ public static class Saves{
         public float GameTime{get;set;}
         public List<Item> InventoryItems{get;set;}
         public List<AlteredObject> AlteredObjects{get;set;}
+        public int Funds{get;set;}
 
-        public SaveData(int setDay = 1, float setTime = 0.0f, int setProgress = 1, int setLocation = 1, List<Item> setInventoryItems = null, List<AlteredObject> setAlteredObjects = null){
+        public SaveData(int setDay = 1, float setTime = 0.0f, int setProgress = 1, int setLocation = 1, List<Item> setInventoryItems = null, List<AlteredObject> setAlteredObjects = null, int setFunds){
             GameDay = setDay;
             GameTime = setTime;
             Progress = setProgress;
@@ -28,6 +29,7 @@ public static class Saves{
             } else {
                 AlteredObjects = new List<AlteredObject>();
             }
+            Funds = setFunds;
         }
     }
 

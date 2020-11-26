@@ -47,6 +47,7 @@ public static class World{
             World.MapItemList.Clear();
             SceneManager.LoadScene(SceneList[sceneNumber], LoadSceneMode.Single);
             Saves.GameData.InventoryItems = Inventory.StoredItems;
+            Saves.GameData.Funds = GameController.Instance.Player.Coins;
             Saves.SaveGame(Saves.GameData);
         }
     }

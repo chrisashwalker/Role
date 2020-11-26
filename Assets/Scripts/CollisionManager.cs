@@ -18,6 +18,7 @@ public class CollisionManager : MonoBehaviour{
                 World.TreeList.Clear();
                 World.MapItemList.Clear();
                 Saves.GameData.InventoryItems = Inventory.StoredItems;
+                Saves.GameData.Funds = GameController.Instance.Player.Coins;
                 Saves.SaveGame(Saves.GameData);
                 SceneManager.LoadScene(World.SceneList[gate.Destination], LoadSceneMode.Single);
                 return null;
