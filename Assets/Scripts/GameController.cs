@@ -30,8 +30,10 @@ public class GameController : MonoBehaviour{
                 }
                 Saves.Loaded = true;
             }
-            Inventory.StoredItems = Saves.GameData.InventoryItems;
+            World.FindCharacters();
+            Player.Storage.StoredItems = Saves.GameData.InventoryItems;
         } else {
+            World.FindCharacters();
             Saves.GameData = new Saves.SaveData();
             Saves.GameData.GameDay = 1;
             Saves.GameData.GameTime = 0.0f;
@@ -39,11 +41,10 @@ public class GameController : MonoBehaviour{
             Saves.GameData.CurrentLocation = 1;
             Inventory.LoadStandardItems();
         }
-        Inventory.EquippedItemIndex = 0;
+        Player.Storage.EquippedItemIndex = 0;
         FullCanvas = GameObject.FindWithTag("FullCanvas");
         AllItemToggles = GameObject.FindGameObjectsWithTag("ItemToggle");
         Inventory.UpdateToggles();
-        World.FindCharacters();
         World.FindObjects();
     }
 

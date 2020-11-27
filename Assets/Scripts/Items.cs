@@ -97,10 +97,10 @@ public sealed class ItemList{
     public static Item Stone = new Item(setIdentifier:9, setName:"Stone");
 }
 
-public static class Inventory{
-    public static int MaxCapacity{get;set;} = 10;
-    public static List<Item> StoredItems{get;set;}  = new List<Item>();
-    public static int EquippedItemIndex{get;set;} = 0;
+public class Inventory{
+    public int MaxCapacity{get;set;} = 10;
+    public List<Item> StoredItems{get;set;}  = new List<Item>();
+    public int EquippedItemIndex{get;set;} = 0;
     public static Dictionary<int, Item> GameItemList{get;set;} = new Dictionary<int, Item>();
     public static void LoadGameItems(){
         GameItemList.Add(ItemList.Sword.Identifier, ItemList.Sword);
@@ -116,13 +116,13 @@ public static class Inventory{
     }
 
     public static void LoadStandardItems(){
-        StoredItems.Add(ItemList.Sword);
-        StoredItems.Add(ItemList.Shovel);
-        StoredItems.Add(ItemList.Pickaxe);
-        StoredItems.Add(ItemList.Axe);
-        StoredItems.Add(ItemList.WateringCan);
-        StoredItems.Add(ItemList.Bow);
-        StoredItems.Add(ItemList.Seed);
+        GameController.Instance.Player.Storage.StoredItems.Add(ItemList.Sword);
+        GameController.Instance.Player.Storage.StoredItems.Add(ItemList.Shovel);
+        GameController.Instance.Player.Storage.StoredItems.Add(ItemList.Pickaxe);
+        GameController.Instance.Player.Storage.StoredItems.Add(ItemList.Axe);
+        GameController.Instance.Player.Storage.StoredItems.Add(ItemList.WateringCan);
+        GameController.Instance.Player.Storage.StoredItems.Add(ItemList.Bow);
+        GameController.Instance.Player.Storage.StoredItems.Add(ItemList.Seed);
     }
 
     public static float toggleWidth = 100.0f;
@@ -134,7 +134,7 @@ public static class Inventory{
             GameObject.Destroy(toggle);
         }
         GameController.Instance.AllItemToggles = new GameObject[0];
-        foreach (Item item in StoredItems){
+        foreach (Item item in GameController.Instance.Player.Storage.StoredItems){
             GameObject newToggleObject = GameObject.Instantiate(Resources.Load<GameObject>("ItemToggle"));
             newToggleObject.tag = "ItemToggle";
             newToggleObject.transform.SetParent(GameController.Instance.FullCanvas.transform, false);
@@ -159,16 +159,16 @@ public static class Inventory{
             int toggleIndex = System.Array.IndexOf(GameController.Instance.AllItemToggles, toggle);
             float positionFromCenter = toggleIndex - ((float) toggleCount / 2) + 0.5f;
             toggle.GetComponent<RectTransform>().anchoredPosition = new Vector2(positionFromCenter * toggleWidth,toggleHeight);
-            if (toggleIndex == EquippedItemIndex){
+            if (toggleIndex == GameController.Instance.Player.Storage.EquippedItemIndex){
                 toggle.GetComponentInChildren<Text>().text = toggle.GetComponentInChildren<Text>().text.ToUpper();
             }
         }
     }
 
-    public static void Equip(GameObject clickedToggle){
-        foreach (Item item in StoredItems){
+    public static void Equip(Character character, GameObject clickedToggle){
+        foreach (Item item in character.Storage.StoredItems){
             if (clickedToggle.GetComponentInChildren<Text>().text == item.Name){
-                EquippedItemIndex = StoredItems.IndexOf(item);
+                GameController.Instance.Player.Storage.EquippedItemIndex = character.Storage.StoredItems.IndexOf(item);
                 break;
             }
         }
@@ -183,19 +183,19 @@ public static class Inventory{
             itemShift = 1;
         }
         if (itemShift != 0){
-            if (EquippedItemIndex + itemShift < 0){
-                EquippedItemIndex = StoredItems.Count - 1;
-            } else if (EquippedItemIndex + itemShift > StoredItems.Count - 1){
-                EquippedItemIndex = 0;
+            if (GameController.Instance.Player.Storage.EquippedItemIndex + itemShift < 0){
+                GameController.Instance.Player.Storage.EquippedItemIndex = GameController.Instance.Player.Storage.StoredItems.Count - 1;
+            } else if (GameController.Instance.Player.Storage.EquippedItemIndex + itemShift > GameController.Instance.Player.Storage.StoredItems.Count - 1){
+                GameController.Instance.Player.Storage.EquippedItemIndex = 0;
             } else {
-                EquippedItemIndex += itemShift;
+                GameController.Instance.Player.Storage.EquippedItemIndex += itemShift;
             }
             UpdateToggles();
         }
         if (Input.GetKeyDown(Controls.UseItem)){
-            if (StoredItems[EquippedItemIndex].Type.Equals(ItemTypes.PROJECTILE)){
-                Actions.ShootProjectile(GameController.Instance.Player, StoredItems[EquippedItemIndex]);
-            } else if (StoredItems[EquippedItemIndex].Type.Equals(ItemTypes.TOOL)){
+            if (GameController.Instance.Player.Storage.StoredItems[GameController.Instance.Player.Storage.EquippedItemIndex].Type.Equals(ItemTypes.PROJECTILE)){
+                Actions.ShootProjectile(GameController.Instance.Player, GameController.Instance.Player.Storage.StoredItems[GameController.Instance.Player.Storage.EquippedItemIndex]);
+            } else if (GameController.Instance.Player.Storage.StoredItems[GameController.Instance.Player.Storage.EquippedItemIndex].Type.Equals(ItemTypes.TOOL)){
                 Actions.UseTool(CollisionManager.CollidedObject);
             }
             UpdateToggles();     

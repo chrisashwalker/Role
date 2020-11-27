@@ -34,7 +34,7 @@ public static class Actions{
     }
 
     public static void UseTool(GameObject collidedObject){
-        Tool UsedTool = (Tool) Inventory.StoredItems[Inventory.EquippedItemIndex];
+        Tool UsedTool = (Tool) GameController.Instance.Player.Storage.StoredItems[GameController.Instance.Player.Storage.EquippedItemIndex];
         ToolFunctions UsedToolFunction = UsedTool.Function;
         Collider[] hitColliders = Physics.OverlapBox(Target.transform.position, new Vector3(0.1f,0.1f,0.1f), Quaternion.identity, InteractiveLayer);
         GameObject hitCollider = null;
@@ -57,35 +57,35 @@ public static class Actions{
                 if (UsedTool.Durability > 1){
                     UsedTool.Durability -= 1;
                 } else {
-                    Inventory.StoredItems.Remove(UsedTool);
-                    Inventory.EquippedItemIndex = 0;
+                    GameController.Instance.Player.Storage.StoredItems.Remove(UsedTool);
+                    GameController.Instance.Player.Storage.EquippedItemIndex = 0;
                 }
-            } else if (Inventory.MaxCapacity > Inventory.StoredItems.Count){
+            } else if (GameController.Instance.Player.Storage.MaxCapacity > GameController.Instance.Player.Storage.StoredItems.Count){
                 if (UsedToolFunction.Equals(ToolFunctions.SHOVEL) && hitCollider.tag == "Placed"){
                     GameObject.Destroy(hitCollider);
                     Saves.GameData.AlteredObjects.Remove(Saves.GameData.AlteredObjects.Find(x => x.Identifier.Equals(hitCollider.GetInstanceID())));
-                    if (Inventory.StoredItems.Contains(ItemList.Seed)){
-                        Tool collectedSeed = (Tool) Inventory.StoredItems.Find(x => x.Equals(ItemList.Seed));
+                    if (GameController.Instance.Player.Storage.StoredItems.Contains(ItemList.Seed)){
+                        Tool collectedSeed = (Tool) GameController.Instance.Player.Storage.StoredItems.Find(x => x.Equals(ItemList.Seed));
                         collectedSeed.Durability += 1;
                     } else {
-                        Inventory.StoredItems.Add(ItemList.Seed);
+                        GameController.Instance.Player.Storage.StoredItems.Add(ItemList.Seed);
                     }
-                } else if (UsedToolFunction.Equals(ToolFunctions.SHOVEL) && Inventory.MaxCapacity >= Inventory.StoredItems.Count + ItemList.Plant.Strength  && hitCollider.tag == "Ready"){
+                } else if (UsedToolFunction.Equals(ToolFunctions.SHOVEL) && GameController.Instance.Player.Storage.MaxCapacity >= GameController.Instance.Player.Storage.StoredItems.Count + ItemList.Plant.Strength  && hitCollider.tag == "Ready"){
                     GameObject.Destroy(hitCollider);
                     Saves.GameData.AlteredObjects.Remove(Saves.GameData.AlteredObjects.Find(x => x.Identifier.Equals(hitCollider.GetInstanceID())));
                     for (int i = 0; i < ItemList.Plant.Strength; i++){
-                        Inventory.StoredItems.Add(ItemList.Plant);
+                        GameController.Instance.Player.Storage.StoredItems.Add(ItemList.Plant);
                     }
                 } else if (hitCollider.tag == "Rock" && UsedToolFunction.Equals(ToolFunctions.PICKAXE) && Input.GetKey(Controls.UseItem)){
                     Saves.GameData.AlteredObjects.Add(new AlteredObject("Removal", hitCollider.gameObject.name, SceneManager.GetActiveScene(), hitCollider.gameObject.transform.position, hitCollider.gameObject.GetInstanceID()));
                     GameObject.Destroy(hitCollider);
                     World.RockList.Remove(hitCollider);
-                    Inventory.StoredItems.Add(ItemList.Stone);
+                    GameController.Instance.Player.Storage.StoredItems.Add(ItemList.Stone);
                 } else if (hitCollider.tag == "Tree" && UsedToolFunction.Equals(ToolFunctions.AXE) && Input.GetKey(Controls.UseItem)){
                     Saves.GameData.AlteredObjects.Add(new AlteredObject("Removal", hitCollider.gameObject.name, SceneManager.GetActiveScene(), hitCollider.gameObject.transform.position, hitCollider.gameObject.GetInstanceID()));
                     GameObject.Destroy(hitCollider);
                     World.TreeList.Remove(hitCollider);
-                    Inventory.StoredItems.Add(ItemList.Wood);
+                    GameController.Instance.Player.Storage.StoredItems.Add(ItemList.Wood);
                 }
             }
         }

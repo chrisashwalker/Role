@@ -46,7 +46,7 @@ public static class World{
             World.TreeList.Clear();
             World.MapItemList.Clear();
             SceneManager.LoadScene(SceneList[sceneNumber], LoadSceneMode.Single);
-            Saves.GameData.InventoryItems = Inventory.StoredItems;
+            Saves.GameData.InventoryItems = GameController.Instance.Player.Storage.StoredItems;
             Saves.GameData.Funds = GameController.Instance.Player.Coins;
             Saves.SaveGame(Saves.GameData);
         }

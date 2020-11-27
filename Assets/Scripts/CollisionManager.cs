@@ -17,7 +17,7 @@ public class CollisionManager : MonoBehaviour{
                 World.RockList.Clear();
                 World.TreeList.Clear();
                 World.MapItemList.Clear();
-                Saves.GameData.InventoryItems = Inventory.StoredItems;
+                Saves.GameData.InventoryItems = GameController.Instance.Player.Storage.StoredItems;
                 Saves.GameData.Funds = GameController.Instance.Player.Coins;
                 Saves.SaveGame(Saves.GameData);
                 SceneManager.LoadScene(World.SceneList[gate.Destination], LoadSceneMode.Single);
@@ -25,10 +25,10 @@ public class CollisionManager : MonoBehaviour{
             }
         }
         foreach (UnityMapItem mapItem in World.MapItemList){
-            if (mapItem.Collider == collision.collider && Input.GetKey(Controls.Interact) & Inventory.StoredItems.Count < Inventory.MaxCapacity){
+            if (mapItem.Collider == collision.collider && Input.GetKey(Controls.Interact) & GameController.Instance.Player.Storage.StoredItems.Count < GameController.Instance.Player.Storage.MaxCapacity){
                 Destroy(mapItem.Object);
                 Saves.GameData.AlteredObjects.Add(new AlteredObject("Removal", mapItem.Object.name, SceneManager.GetActiveScene(), mapItem.Object.transform.position, mapItem.Object.GetInstanceID()));
-                Inventory.StoredItems.Add(mapItem.linkedItem);
+                GameController.Instance.Player.Storage.StoredItems.Add(mapItem.linkedItem);
                 Inventory.UpdateToggles();
                 return null;
             }
