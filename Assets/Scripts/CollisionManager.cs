@@ -8,6 +8,16 @@ public class CollisionManager : MonoBehaviour{
     }
 
     private GameObject CollisionCheck(Collision collision){
+        foreach (UnityCharacter character in World.CharacterList){
+            if (character.Collider == collision.collider && Input.GetKey(Controls.Buy)){
+                Trading.FindSaleItems(GameController.Instance.Player, character);
+                return null;
+            }
+            if (character.Collider == collision.collider && Input.GetKey(Controls.Sell)){
+                Trading.FindSaleItems(character, GameController.Instance.Player);
+                return null;
+            }
+        }
         foreach (UnityGate gate in World.GateList){
             if (gate.Collider == collision.collider && Input.GetKey(Controls.Interact)){
                 Saves.GameData.CurrentLocation = gate.Destination;

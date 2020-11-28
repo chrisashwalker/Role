@@ -18,7 +18,7 @@ public abstract class Character{
     public int Coins{get;set;}
     public Inventory Storage{get;set;}
     
-    public Character(CharacterTypes setType = CharacterTypes.NPC, string setName = "???", float setSpeed = 1.0f, int setMaxHealth = 1, int setMaxStamina = 1, int setStrength = 1, int setCoins = 0){
+    public Character(CharacterTypes setType = CharacterTypes.NPC, string setName = "???", float setSpeed = 1.0f, int setMaxHealth = 1, int setMaxStamina = 1, int setStrength = 1, int setCoins = 10){
         Type = setType;
         Name = setName;
         Speed = setSpeed;

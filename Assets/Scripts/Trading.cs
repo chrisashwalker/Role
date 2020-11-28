@@ -1,5 +1,8 @@
 using System.Collections.Generic;
 
+using UnityEngine;
+using UnityEngine.UI;
+
 public static class Trading{
     public static bool InTrade{get;set;} = false;
     public static Character Buyer{get;set;}
@@ -12,17 +15,48 @@ public static class Trading{
         foreach (Item item in Seller.Storage.StoredItems){
             SaleItems.Add(item);
         }
+        InTrade = true;
+        GenerateUI();
     }
 
-    public static void TradeItem(Item item){
-        if (Buyer.Coins >= item.Value && Buyer.Storage.StoredItems.Count < Buyer.Storage.MaxCapacity){
-            Buyer.Coins -= item.Value;
-            Seller.Coins += item.Value;
-            Seller.Storage.StoredItems.Remove(item);
-            Buyer.Storage.StoredItems.Add(item);
+    public static void TradeItem(GameObject clickedToggle){
+        Item tradedItem = null;
+        foreach (Item item in SaleItems){
+            if (clickedToggle.GetComponentInChildren<Text>().text == item.Name + " : " + item.Value){
+                tradedItem = item;
+            }
+        }
+        if (Buyer.Coins >= tradedItem.Value && Buyer.Storage.StoredItems.Count < Buyer.Storage.MaxCapacity){
+            Buyer.Coins -= tradedItem.Value;
+            Seller.Coins += tradedItem.Value;
+            Seller.Storage.StoredItems.Remove(tradedItem);
+            Buyer.Storage.StoredItems.Add(tradedItem);
             InTrade = false;
+            Inventory.UpdateToggles();
         } else {
             InTrade = true;
+        }
+    }
+
+     public static void GenerateUI(){
+        foreach (GameObject toggle in GameController.Instance.AllItemToggles){
+            toggle.SetActive(false);
+            GameObject.Destroy(toggle);
+        }
+        foreach (Item item in SaleItems){
+            GameObject newToggleObject = GameObject.Instantiate(Resources.Load<GameObject>("ItemToggle"));
+            newToggleObject.tag = "ItemToggle";
+            newToggleObject.transform.SetParent(GameController.Instance.FullCanvas.transform, false);
+            string itemLabel;
+            itemLabel = item.Name + " : " + item.Value;
+            newToggleObject.GetComponentInChildren<Text>().text = itemLabel;
+        }
+        GameController.Instance.AllItemToggles = GameObject.FindGameObjectsWithTag("ItemToggle");
+        int toggleCount = GameController.Instance.AllItemToggles.Length;
+        foreach (GameObject toggle in GameController.Instance.AllItemToggles){
+            int toggleIndex = System.Array.IndexOf(GameController.Instance.AllItemToggles, toggle);
+            float positionFromCenter = toggleIndex - ((float) toggleCount / 2) + 0.5f;
+            toggle.GetComponent<RectTransform>().anchoredPosition = new Vector2(positionFromCenter * Inventory.toggleWidth, Inventory.toggleHeight);
         }
     }
 }
