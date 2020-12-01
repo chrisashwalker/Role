@@ -12,3 +12,4 @@ UIElementsSchema/
 Assets/*
 !Assets/Scripts/
 *.meta
+Texture Models/

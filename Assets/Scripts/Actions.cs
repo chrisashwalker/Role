@@ -43,7 +43,7 @@ public static class Actions{
         }
         if (hitCollider == null){
             if (UsedToolFunction.Equals(ToolFunctions.WATER)){
-                GameObject Prepared = GameObject.Instantiate(Resources.Load<GameObject>("Prepared"));
+                GameObject Prepared = GameObject.Instantiate(Resources.Load<GameObject>("Mud"));
                 Prepared.transform.position = Target.transform.position;
                 Saves.GameData.AlteredObjects.Add(new AlteredObject("Addition", Prepared.name, SceneManager.GetActiveScene(), Prepared.transform.position, Prepared.GetInstanceID()));
             }
@@ -51,7 +51,7 @@ public static class Actions{
             if (UsedToolFunction.Equals(ToolFunctions.SEED) && hitCollider.tag == "Prepared"){
                 Saves.GameData.AlteredObjects.Remove(Saves.GameData.AlteredObjects.Find(x => x.Identifier.Equals(hitCollider.GetInstanceID())));
                 GameObject.Destroy(hitCollider);
-                GameObject Placed = GameObject.Instantiate(Resources.Load<GameObject>("Placed"));
+                GameObject Placed = GameObject.Instantiate(Resources.Load<GameObject>("PlacedCarrot"));
                 Placed.transform.position = Target.transform.position;
                 Saves.GameData.AlteredObjects.Add(new AlteredObject("Addition", Placed.name, SceneManager.GetActiveScene(), Placed.transform.position, Placed.GetInstanceID()));
                 if (UsedTool.Durability > 1){
@@ -61,7 +61,7 @@ public static class Actions{
                     GameController.Instance.Player.Storage.EquippedItemIndex = 0;
                 }
             } else if (GameController.Instance.Player.Storage.MaxCapacity > GameController.Instance.Player.Storage.StoredItems.Count){
-                if (UsedToolFunction.Equals(ToolFunctions.SHOVEL) && hitCollider.tag == "Placed"){
+                if (UsedToolFunction.Equals(ToolFunctions.SHOVEL) && hitCollider.tag == "PlacedCarrot"){
                     GameObject.Destroy(hitCollider);
                     Saves.GameData.AlteredObjects.Remove(Saves.GameData.AlteredObjects.Find(x => x.Identifier.Equals(hitCollider.GetInstanceID())));
                     if (GameController.Instance.Player.Storage.StoredItems.Contains(ItemList.Seed)){
