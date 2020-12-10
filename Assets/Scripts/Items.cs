@@ -129,15 +129,15 @@ public class Inventory{
     public static float toggleHeight = 25.0f;
 
     public static void UpdateToggles(){
-        foreach (GameObject toggle in GameController.Instance.AllItemToggles){
+        foreach (GameObject toggle in GameController.Instance.AllShortcutToggles){
             toggle.SetActive(false);
             GameObject.Destroy(toggle);
         }
-        GameController.Instance.AllItemToggles = new GameObject[0];
+        GameController.Instance.AllShortcutToggles = new GameObject[0];
         foreach (Item item in GameController.Instance.Player.Storage.StoredItems){
-            GameObject newToggleObject = GameObject.Instantiate(Resources.Load<GameObject>("ItemToggle"));
-            newToggleObject.tag = "ItemToggle";
-            newToggleObject.transform.SetParent(GameController.Instance.FullCanvas.transform, false);
+            GameObject newToggleObject = GameObject.Instantiate(Resources.Load<GameObject>("Control/ShortcutToggle"));
+            newToggleObject.tag = "ShortcutToggle";
+            newToggleObject.transform.SetParent(GameController.Instance.ShortcutCanvas.transform, false);
             string itemLabel;
             int itemDurability;
             if (item.Type == ItemTypes.TOOL){
@@ -153,10 +153,10 @@ public class Inventory{
             }
             newToggleObject.GetComponentInChildren<Text>().text = itemLabel;
         }
-        GameController.Instance.AllItemToggles = GameObject.FindGameObjectsWithTag("ItemToggle");
-        int toggleCount = GameController.Instance.AllItemToggles.Length;
-        foreach (GameObject toggle in GameController.Instance.AllItemToggles){
-            int toggleIndex = System.Array.IndexOf(GameController.Instance.AllItemToggles, toggle);
+        GameController.Instance.AllShortcutToggles = GameObject.FindGameObjectsWithTag("ShortcutToggle");
+        int toggleCount = GameController.Instance.AllShortcutToggles.Length;
+        foreach (GameObject toggle in GameController.Instance.AllShortcutToggles){
+            int toggleIndex = System.Array.IndexOf(GameController.Instance.AllShortcutToggles, toggle);
             float positionFromCenter = toggleIndex - ((float) toggleCount / 2) + 0.5f;
             toggle.GetComponent<RectTransform>().anchoredPosition = new Vector2(positionFromCenter * toggleWidth,toggleHeight);
             if (toggleIndex == GameController.Instance.Player.Storage.EquippedItemIndex){
@@ -213,7 +213,7 @@ public class UnityProjectile : Projectile{
 
     public UnityProjectile(int setIdentifier = 0){
         Identifier = setIdentifier;
-        Object = (GameObject) GameObject.Instantiate(Resources.Load("Projectile", typeof(GameObject)));
+        Object = (GameObject) GameObject.Instantiate(Resources.Load("Objects/Projectile1", typeof(GameObject)));
         Name = Object.name;
         Rigidbody = Object.GetComponent<Rigidbody>();
         Collider = Object.GetComponent<Collider>();

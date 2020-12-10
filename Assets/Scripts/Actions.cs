@@ -12,7 +12,7 @@ public static class Actions{
 
     public static void FindTarget(){
         if (Target == null){
-            Target = GameObject.Instantiate(Resources.Load<GameObject>("Target"));
+            Target = GameObject.Instantiate(Resources.Load<GameObject>("Objects/TargetTile"));
         }
         float targetX, targetY, targetZ;
         targetY = 0.04f;
@@ -43,17 +43,17 @@ public static class Actions{
         }
         if (hitCollider == null){
             if (UsedToolFunction.Equals(ToolFunctions.WATER)){
-                GameObject Prepared = GameObject.Instantiate(Resources.Load<GameObject>("Mud"));
-                Prepared.transform.position = Target.transform.position;
-                Saves.GameData.AlteredObjects.Add(new AlteredObject("Addition", Prepared.name, SceneManager.GetActiveScene(), Prepared.transform.position, Prepared.GetInstanceID()));
+                GameObject Soil = GameObject.Instantiate(Resources.Load<GameObject>("Objects/Soil"));
+                Soil.transform.position = Target.transform.position;
+                Saves.GameData.AlteredObjects.Add(new AlteredObject("Addition", Soil.name, SceneManager.GetActiveScene(), Soil.transform.position, Soil.GetInstanceID()));
             }
         } else {
-            if (UsedToolFunction.Equals(ToolFunctions.SEED) && hitCollider.tag == "Prepared"){
+            if (UsedToolFunction.Equals(ToolFunctions.SEED) && hitCollider.tag == "Soil"){
                 Saves.GameData.AlteredObjects.Remove(Saves.GameData.AlteredObjects.Find(x => x.Identifier.Equals(hitCollider.GetInstanceID())));
                 GameObject.Destroy(hitCollider);
-                GameObject Placed = GameObject.Instantiate(Resources.Load<GameObject>("PlacedCarrot"));
-                Placed.transform.position = Target.transform.position;
-                Saves.GameData.AlteredObjects.Add(new AlteredObject("Addition", Placed.name, SceneManager.GetActiveScene(), Placed.transform.position, Placed.GetInstanceID()));
+                GameObject Plant = GameObject.Instantiate(Resources.Load<GameObject>("Plants/Plant_Carrot"));
+                Plant.transform.position = Target.transform.position;
+                Saves.GameData.AlteredObjects.Add(new AlteredObject("Addition", Plant.name, SceneManager.GetActiveScene(), Plant.transform.position, Plant.GetInstanceID()));
                 if (UsedTool.Durability > 1){
                     UsedTool.Durability -= 1;
                 } else {
@@ -61,7 +61,7 @@ public static class Actions{
                     GameController.Instance.Player.Storage.EquippedItemIndex = 0;
                 }
             } else if (GameController.Instance.Player.Storage.MaxCapacity > GameController.Instance.Player.Storage.StoredItems.Count){
-                if (UsedToolFunction.Equals(ToolFunctions.SHOVEL) && hitCollider.tag == "PlacedCarrot"){
+                if (UsedToolFunction.Equals(ToolFunctions.SHOVEL) && hitCollider.tag == "Plant"){
                     GameObject.Destroy(hitCollider);
                     Saves.GameData.AlteredObjects.Remove(Saves.GameData.AlteredObjects.Find(x => x.Identifier.Equals(hitCollider.GetInstanceID())));
                     if (GameController.Instance.Player.Storage.StoredItems.Contains(ItemList.Seed)){
@@ -70,7 +70,7 @@ public static class Actions{
                     } else {
                         GameController.Instance.Player.Storage.StoredItems.Add(ItemList.Seed);
                     }
-                } else if (UsedToolFunction.Equals(ToolFunctions.SHOVEL) && GameController.Instance.Player.Storage.MaxCapacity >= GameController.Instance.Player.Storage.StoredItems.Count + ItemList.Plant.Strength  && hitCollider.tag == "Ready"){
+                } else if (UsedToolFunction.Equals(ToolFunctions.SHOVEL) && GameController.Instance.Player.Storage.MaxCapacity >= GameController.Instance.Player.Storage.StoredItems.Count + ItemList.Plant.Strength  && hitCollider.tag == "Crop"){
                     GameObject.Destroy(hitCollider);
                     Saves.GameData.AlteredObjects.Remove(Saves.GameData.AlteredObjects.Find(x => x.Identifier.Equals(hitCollider.GetInstanceID())));
                     for (int i = 0; i < ItemList.Plant.Strength; i++){

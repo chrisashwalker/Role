@@ -39,22 +39,22 @@ public static class Trading{
     }
 
      public static void GenerateUI(){
-        foreach (GameObject toggle in GameController.Instance.AllItemToggles){
+        foreach (GameObject toggle in GameController.Instance.AllShortcutToggles){
             toggle.SetActive(false);
             GameObject.Destroy(toggle);
         }
         foreach (Item item in SaleItems){
-            GameObject newToggleObject = GameObject.Instantiate(Resources.Load<GameObject>("ItemToggle"));
-            newToggleObject.tag = "ItemToggle";
-            newToggleObject.transform.SetParent(GameController.Instance.FullCanvas.transform, false);
+            GameObject newToggleObject = GameObject.Instantiate(Resources.Load<GameObject>("Control/ShortcutToggle"));
+            newToggleObject.tag = "ShortcutToggle";
+            newToggleObject.transform.SetParent(GameController.Instance.ShortcutCanvas.transform, false);
             string itemLabel;
             itemLabel = item.Name + " : " + item.Value;
             newToggleObject.GetComponentInChildren<Text>().text = itemLabel;
         }
-        GameController.Instance.AllItemToggles = GameObject.FindGameObjectsWithTag("ItemToggle");
-        int toggleCount = GameController.Instance.AllItemToggles.Length;
-        foreach (GameObject toggle in GameController.Instance.AllItemToggles){
-            int toggleIndex = System.Array.IndexOf(GameController.Instance.AllItemToggles, toggle);
+        GameController.Instance.AllShortcutToggles = GameObject.FindGameObjectsWithTag("ShortcutToggle");
+        int toggleCount = GameController.Instance.AllShortcutToggles.Length;
+        foreach (GameObject toggle in GameController.Instance.AllShortcutToggles){
+            int toggleIndex = System.Array.IndexOf(GameController.Instance.AllShortcutToggles, toggle);
             float positionFromCenter = toggleIndex - ((float) toggleCount / 2) + 0.5f;
             toggle.GetComponent<RectTransform>().anchoredPosition = new Vector2(positionFromCenter * Inventory.toggleWidth, Inventory.toggleHeight);
         }

@@ -6,16 +6,16 @@ using UnityEngine.SceneManagement;
 public class GameController : MonoBehaviour{
     public static GameController Instance{get;set;}
     public UnityCharacter Player{get;set;}
-    public int RegenDays = 3;
-    public GameObject FullCanvas{get;set;}
-    public GameObject[] AllItemToggles{get;set;}
+    private int RegenDays = 3;
+    public GameObject ShortcutCanvas{get;set;}
+    public GameObject[] AllShortcutToggles{get;set;}
 
     void Awake(){
         Instance = this;
         CameraManager.MainCamera = GameObject.FindWithTag("MainCamera").GetComponent<Camera>();
         CameraManager.standardCameraSize = CameraManager.MainCamera.orthographicSize;
         TimeManager.Sunlight = GameObject.FindWithTag("Sunlight").GetComponent<Light>();
-        Actions.InteractiveLayer = LayerMask.GetMask("Interactable");
+        Actions.InteractiveLayer = LayerMask.GetMask("Interactive");
         if (World.SceneList.Count == 0){
             World.BuildScenes();
         }
@@ -42,8 +42,8 @@ public class GameController : MonoBehaviour{
             Inventory.LoadStandardItems();
         }
         Player.Storage.EquippedItemIndex = 0;
-        FullCanvas = GameObject.FindWithTag("FullCanvas");
-        AllItemToggles = GameObject.FindGameObjectsWithTag("ItemToggle");
+        ShortcutCanvas = GameObject.FindWithTag("ShortcutCanvas");
+        AllShortcutToggles = GameObject.FindGameObjectsWithTag("ShortcutToggle");
         Inventory.UpdateToggles();
         World.FindObjects();
     }
@@ -55,9 +55,9 @@ public class GameController : MonoBehaviour{
                 if (po.Change == "Addition"){
                     GameObject loadedPo;
                     if (po.DaysAltered >= RegenDays){
-                        loadedPo = Instantiate(Resources.Load(po.endPrefab, typeof(GameObject))) as GameObject;
+                        loadedPo = Instantiate(Resources.Load("Plants/" + po.endPrefab, typeof(GameObject))) as GameObject;
                     } else {
-                    loadedPo = Instantiate(Resources.Load(po.startPrefab, typeof(GameObject))) as GameObject;
+                    loadedPo = Instantiate(Resources.Load("Plants/" + po.startPrefab, typeof(GameObject))) as GameObject;
                     }
                     po.Identifier = loadedPo.GetInstanceID();
                     loadedPo.transform.position = new Vector3(po.PositionX, po.PositionY, po.PositionZ);

@@ -12,8 +12,7 @@ public static class World{
     public static List<GameObject> RockList{get;set;} = new List<GameObject>();
 
     public static void BuildScenes(){
-        SceneList.Add(1, "1_home");
-        SceneList.Add(2, "2_field");
+        SceneList.Add(1, "Scene1");
     }
 
     public static void FindCharacters(){
@@ -85,7 +84,7 @@ public class UnityBarrier : Barrier{
     public int Identifier{get;set;}
 
     public UnityBarrier(string barrierPrefab){
-        Object = (GameObject) GameObject.Instantiate(Resources.Load(barrierPrefab, typeof(GameObject)));
+        Object = (GameObject) GameObject.Instantiate(Resources.Load("Objects/" + barrierPrefab, typeof(GameObject)));
         Rigidbody = Object.GetComponent<Rigidbody>();
         Collider = Object.GetComponent<Collider>();
         Identifier = Object.GetInstanceID();
@@ -137,7 +136,7 @@ public class AlteredObject{
     public AlteredObject(string setChange, string setPrefab, Scene setScene, Vector3 setPosition, int setIdentifier, int setDaysAltered = 0){
         Change = setChange;
         startPrefab = setPrefab.Replace("(Clone)","");
-        endPrefab = startPrefab.Replace("Placed","Ready");
+        endPrefab = startPrefab.Replace("Plant","Grown");
         Scene = setScene.name;
         PositionX = setPosition.x;
         PositionY = setPosition.y;
