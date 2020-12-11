@@ -6,7 +6,7 @@ public static class CameraManager{
     public static bool cameraIsStandardSized{get;set;} = true;
 
     public static void CameraFollow(){
-        MainCamera.transform.position = new Vector3(GameController.Instance.Player.Rigidbody.position.x, GameController.Instance.Player.Rigidbody.position.y + 4.5f, GameController.Instance.Player.Rigidbody.position.z - 7.0f);
+        MainCamera.transform.position = new Vector3(GameController.Instance.Player.Rigidbody.position.x, GameController.Instance.Player.Rigidbody.position.y + 9.5f, GameController.Instance.Player.Rigidbody.position.z - 15.0f);
     }
 
     public static void MapToggle(){
