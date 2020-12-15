@@ -12,7 +12,7 @@ public static class Actions{
 
     public static void FindTarget(){
         if (Target == null){
-            Target = GameObject.Instantiate(Resources.Load<GameObject>("Objects/TargetTile"));
+            Target = GameObject.Instantiate(Resources.Load<GameObject>("Target"));
         }
         float targetX, targetY, targetZ;
         targetY = 0.04f;
@@ -43,7 +43,7 @@ public static class Actions{
         }
         if (hitCollider == null){
             if (UsedToolFunction.Equals(ToolFunctions.WATER)){
-                GameObject Soil = GameObject.Instantiate(Resources.Load<GameObject>("Objects/Soil"));
+                GameObject Soil = GameObject.Instantiate(Resources.Load<GameObject>("Soil"));
                 Soil.transform.position = Target.transform.position;
                 Saves.GameData.AlteredObjects.Add(new AlteredObject("Addition", Soil.name, SceneManager.GetActiveScene(), Soil.transform.position, Soil.GetInstanceID()));
             }
@@ -51,7 +51,7 @@ public static class Actions{
             if (UsedToolFunction.Equals(ToolFunctions.SEED) && hitCollider.tag == "Soil"){
                 Saves.GameData.AlteredObjects.Remove(Saves.GameData.AlteredObjects.Find(x => x.Identifier.Equals(hitCollider.GetInstanceID())));
                 GameObject.Destroy(hitCollider);
-                GameObject Plant = GameObject.Instantiate(Resources.Load<GameObject>("Plants/Plant_Carrot"));
+                GameObject Plant = GameObject.Instantiate(Resources.Load<GameObject>("Carrot_Start"));
                 Plant.transform.position = Target.transform.position;
                 Saves.GameData.AlteredObjects.Add(new AlteredObject("Addition", Plant.name, SceneManager.GetActiveScene(), Plant.transform.position, Plant.GetInstanceID()));
                 if (UsedTool.Durability > 1){

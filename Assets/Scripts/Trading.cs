@@ -44,7 +44,7 @@ public static class Trading{
             GameObject.Destroy(toggle);
         }
         foreach (Item item in SaleItems){
-            GameObject newToggleObject = GameObject.Instantiate(Resources.Load<GameObject>("Control/ShortcutToggle"));
+            GameObject newToggleObject = GameObject.Instantiate(Resources.Load<GameObject>("ShortcutToggle"));
             newToggleObject.tag = "ShortcutToggle";
             newToggleObject.transform.SetParent(GameController.Instance.ShortcutCanvas.transform, false);
             string itemLabel;

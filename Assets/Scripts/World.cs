@@ -136,7 +136,7 @@ public class AlteredObject{
     public AlteredObject(string setChange, string setPrefab, Scene setScene, Vector3 setPosition, int setIdentifier, int setDaysAltered = 0){
         Change = setChange;
         startPrefab = setPrefab.Replace("(Clone)","");
-        endPrefab = startPrefab.Replace("Plant","Grown");
+        endPrefab = startPrefab.Replace("Start","End");
         Scene = setScene.name;
         PositionX = setPosition.x;
         PositionY = setPosition.y;

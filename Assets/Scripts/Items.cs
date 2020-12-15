@@ -135,7 +135,7 @@ public class Inventory{
         }
         GameController.Instance.AllShortcutToggles = new GameObject[0];
         foreach (Item item in GameController.Instance.Player.Storage.StoredItems){
-            GameObject newToggleObject = GameObject.Instantiate(Resources.Load<GameObject>("Control/ShortcutToggle"));
+            GameObject newToggleObject = GameObject.Instantiate(Resources.Load<GameObject>("ShortcutToggle"));
             newToggleObject.tag = "ShortcutToggle";
             newToggleObject.transform.SetParent(GameController.Instance.ShortcutCanvas.transform, false);
             string itemLabel;
@@ -213,7 +213,7 @@ public class UnityProjectile : Projectile{
 
     public UnityProjectile(int setIdentifier = 0){
         Identifier = setIdentifier;
-        Object = (GameObject) GameObject.Instantiate(Resources.Load("Objects/Projectile1", typeof(GameObject)));
+        Object = (GameObject) GameObject.Instantiate(Resources.Load("Projectile1", typeof(GameObject)));
         Name = Object.name;
         Rigidbody = Object.GetComponent<Rigidbody>();
         Collider = Object.GetComponent<Collider>();
