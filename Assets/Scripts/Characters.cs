@@ -37,6 +37,7 @@ public class UnityCharacter : Character{
     public Rigidbody Rigidbody{get;set;}
     public Collider Collider{get;set;}
     public int Identifier{get;set;}
+    public bool Grounded{get;set;}
 
     public UnityCharacter(GameObject go){
         Object = go;
@@ -47,5 +48,6 @@ public class UnityCharacter : Character{
         if (Object.tag == "Player"){
             Type = CharacterTypes.Player;
         }
+        Grounded = false;
     }
 }

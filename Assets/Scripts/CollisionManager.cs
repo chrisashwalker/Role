@@ -4,9 +4,18 @@ using UnityEngine.SceneManagement;
 public class CollisionManager : MonoBehaviour{
     public static GameObject CollidedObject;
     private void OnCollisionStay(Collision collision){
+        if (collision.gameObject.tag == "Ground"){
+            GameController.Instance.Player.Grounded = true;
+        }
         CollidedObject = CollisionCheck(collision);
     }
 
+    private void OnCollisionExit(Collision collision){
+        if (collision.gameObject.tag == "Ground"){
+            GameController.Instance.Player.Grounded = false;
+        }
+    }
+    
     private GameObject CollisionCheck(Collision collision){
         foreach (UnityCharacter character in World.CharacterList){
             if (character.Collider == collision.collider && Input.GetKey(Controls.Buy)){
