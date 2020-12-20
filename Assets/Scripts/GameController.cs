@@ -36,7 +36,7 @@ public class GameController : MonoBehaviour{
             World.FindCharacters();
             Saves.GameData = new Saves.SaveData();
             Saves.GameData.GameDay = 1;
-            Saves.GameData.GameTime = 0.0f;
+            Saves.GameData.GameTime = 300.0f;
             Saves.GameData.FarthestLocation = 1;
             Saves.GameData.CurrentLocation = 1;
             Inventory.LoadStandardItems();
