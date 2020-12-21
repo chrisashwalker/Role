@@ -9,6 +9,7 @@ public class GameController : MonoBehaviour{
     private int RegenDays = 3;
     public GameObject ShortcutCanvas{get;set;}
     public GameObject[] AllShortcutToggles{get;set;}
+    public Animator anim;
 
     void Awake(){
         Instance = this;

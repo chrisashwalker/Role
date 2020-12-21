@@ -13,13 +13,19 @@ public static class Controls{
         if(character.Grounded){
             character.Rigidbody.velocity = new Vector3(Input.GetAxis("Horizontal") * 10,0,Input.GetAxis("Vertical") * 20);
             if (character.Rigidbody.velocity.z > 0){
+                GameController.Instance.anim.SetBool("Moving", true);
                 character.Rigidbody.MoveRotation(Quaternion.Euler(0,180.0f,0));
             } else if (character.Rigidbody.velocity.z < 0){
+                GameController.Instance.anim.SetBool("Moving", true);
                 character.Rigidbody.MoveRotation(Quaternion.Euler(0,0,0));
             } else if (character.Rigidbody.velocity.x > 0){
+                GameController.Instance.anim.SetBool("Moving", true);
                 character.Rigidbody.MoveRotation(Quaternion.Euler(0,270.0f,0));
             } else if (character.Rigidbody.velocity.x < 0){
+                GameController.Instance.anim.SetBool("Moving", true);
                 character.Rigidbody.MoveRotation(Quaternion.Euler(0,90.0f,0));
+            } else {
+                GameController.Instance.anim.SetBool("Moving", false);
             }
         }
     }
