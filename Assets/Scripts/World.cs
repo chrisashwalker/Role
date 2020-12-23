@@ -13,6 +13,9 @@ public static class World{
 
     public static void BuildScenes(){
         SceneList.Add(1, "Scene1");
+        SceneList.Add(2, "Scene2");
+        SceneList.Add(3, "Scene3");
+        SceneList.Add(4, "Scene4");
     }
 
     public static void FindCharacters(){
@@ -58,14 +61,14 @@ public enum BarrierTypes{
 }
 
 public abstract class Barrier{
-        public BarrierTypes Type{get;set;}
-        public int Durability{get;set;}
+    public BarrierTypes Type{get;set;}
+    public int Durability{get;set;}
 
-        public Barrier(int setDurability = 0){
-            Type = BarrierTypes.Barrier;
-            Durability = setDurability;
-        }
+    public Barrier(int setDurability = 0){
+        Type = BarrierTypes.Barrier;
+        Durability = setDurability;
     }
+}
 
 public abstract class Gate : Barrier{
     public int Destination{get;set;}
