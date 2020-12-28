@@ -12,4 +12,4 @@ UIElementsSchema/
 Assets/*
 !Assets/Scripts/
 *.meta
-Graphics/
+Models/

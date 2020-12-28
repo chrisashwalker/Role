@@ -12,10 +12,7 @@ public static class World{
     public static List<GameObject> RockList{get;set;} = new List<GameObject>();
 
     public static void BuildScenes(){
-        SceneList.Add(1, "Scene1");
-        SceneList.Add(2, "Scene2");
-        SceneList.Add(3, "Scene3");
-        SceneList.Add(4, "Scene4");
+        SceneList.Add(0, "0_Home");
     }
 
     public static void FindCharacters(){
