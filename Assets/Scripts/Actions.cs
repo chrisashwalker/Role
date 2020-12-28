@@ -51,7 +51,7 @@ public static class Actions{
             if (UsedToolFunction.Equals(ToolFunctions.SEED) && hitCollider.tag == "Soil"){
                 Saves.GameData.AlteredObjects.Remove(Saves.GameData.AlteredObjects.Find(x => x.Identifier.Equals(hitCollider.GetInstanceID())));
                 GameObject.Destroy(hitCollider);
-                GameObject Plant = GameObject.Instantiate(Resources.Load<GameObject>("Carrot_Start"));
+                GameObject Plant = GameObject.Instantiate(Resources.Load<GameObject>("CarrotStart"));
                 Plant.transform.position = Target.transform.position;
                 Saves.GameData.AlteredObjects.Add(new AlteredObject("Addition", Plant.name, SceneManager.GetActiveScene(), Plant.transform.position, Plant.GetInstanceID()));
                 if (UsedTool.Durability > 1){
