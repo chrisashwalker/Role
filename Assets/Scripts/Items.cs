@@ -213,7 +213,7 @@ public class UnityProjectile : Projectile{
 
     public UnityProjectile(int setIdentifier = 0){
         Identifier = setIdentifier;
-        Object = (GameObject) GameObject.Instantiate(Resources.Load("Projectile1", typeof(GameObject)));
+        Object = (GameObject) GameObject.Instantiate(Resources.Load("Projectile", typeof(GameObject)));
         Name = Object.name;
         Rigidbody = Object.GetComponent<Rigidbody>();
         Collider = Object.GetComponent<Collider>();
