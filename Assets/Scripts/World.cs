@@ -13,6 +13,9 @@ public static class World{
 
     public static void BuildScenes(){
         SceneList.Add(0, "0_Home");
+        SceneList.Add(0, "1_Field");
+        SceneList.Add(0, "2_Village");
+        SceneList.Add(0, "3_Wood");
     }
 
     public static void FindCharacters(){

@@ -99,20 +99,20 @@ public static class Actions{
         float speed = 10f;
         if (GameController.Instance.Player.Rigidbody.rotation.eulerAngles.y < 90){
             offsetX = 0f;
-            offsetZ = -1f;
-            direction = Vector3.back;
-        } else if (GameController.Instance.Player.Rigidbody.rotation.eulerAngles.y < 180){
-            offsetX = -1f;
-            offsetZ = 0f;
-            direction = Vector3.left;
-        } else if  (GameController.Instance.Player.Rigidbody.rotation.eulerAngles.y < 270){
-            offsetX = 0f;
             offsetZ = 1f;
             direction = Vector3.forward;
-        } else {
+        } else if (GameController.Instance.Player.Rigidbody.rotation.eulerAngles.y < 180){
             offsetX = 1f;
             offsetZ = 0f;
             direction = Vector3.right;
+        } else if  (GameController.Instance.Player.Rigidbody.rotation.eulerAngles.y < 270){
+            offsetX = 0f;
+            offsetZ = -1f;
+            direction = Vector3.back;
+        } else {
+            offsetX = -1f;
+            offsetZ = 0f;
+            direction = Vector3.left;
         }
         projectile.Origin = new Vector3(shooter.Rigidbody.position.x + offsetX, shooter.Rigidbody.position.y, shooter.Rigidbody.position.z + offsetZ);
         projectile.Rigidbody.transform.position = projectile.Origin;
