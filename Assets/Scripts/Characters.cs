@@ -38,6 +38,7 @@ public class UnityCharacter : Character{
     public Collider Collider{get;set;}
     public int Identifier{get;set;}
     public bool Grounded{get;set;}
+    public float LastShot{get;set;}
 
     public UnityCharacter(GameObject go){
         Object = go;
@@ -49,5 +50,6 @@ public class UnityCharacter : Character{
             Type = CharacterTypes.Player;
         }
         Grounded = false;
+        LastShot = 0.0f;
     }
 }

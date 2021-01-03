@@ -8,6 +8,7 @@ public static class World{
     public static List<UnityGate> GateList{get;set;} = new List<UnityGate>();
     public static List<UnityMapItem> MapItemList{get;set;} = new List<UnityMapItem>();
     public static List<UnityCharacter> CharacterList{get;set;} = new List<UnityCharacter>();
+    public static List<UnityCharacter> EnemyList{get;set;} = new List<UnityCharacter>();
     public static List<GameObject> TreeList{get;set;} = new List<GameObject>();
     public static List<GameObject> RockList{get;set;} = new List<GameObject>();
 
@@ -16,6 +17,8 @@ public static class World{
         SceneList.Add(1, "1_Field");
         SceneList.Add(2, "2_Village");
         SceneList.Add(3, "3_Wood");
+        SceneList.Add(4, "4_Quarry");
+        SceneList.Add(5, "5_Lake");
     }
 
     public static void FindCharacters(){
@@ -23,6 +26,10 @@ public static class World{
         foreach (GameObject character in GameObject.FindGameObjectsWithTag("Character")){
             UnityCharacter newCharacter = new UnityCharacter(character);
             CharacterList.Add(newCharacter);
+        }
+        foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy")){
+            UnityCharacter newEnemy = new UnityCharacter(enemy);
+            EnemyList.Add(newEnemy);
         }
     }
 

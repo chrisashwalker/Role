@@ -128,5 +128,8 @@ public class GameController : MonoBehaviour{
             GameObject.Destroy(projectile.Object);
         }
         Actions.SpentProjectiles.Clear();
+        foreach (UnityCharacter enemy in World.EnemyList){
+            Actions.FollowCharacter(Player, enemy);
+        }
     }
 }
