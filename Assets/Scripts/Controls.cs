@@ -11,7 +11,7 @@ public static class Controls{
 
     public static void MoveCharacter(UnityCharacter character){
         if(character.Grounded){
-            character.Rigidbody.velocity = new Vector3(Input.GetAxis("Horizontal") * 10,0,Input.GetAxis("Vertical") * 20);
+            character.Rigidbody.velocity = new Vector3(Input.GetAxis("Horizontal") * 10,0,Input.GetAxis("Vertical") * 10);
             if (character.Rigidbody.velocity.z > 0){
                 GameController.Instance.anim.SetBool("Moving", true);
                 character.Rigidbody.MoveRotation(Quaternion.Euler(0,0.0f,0));

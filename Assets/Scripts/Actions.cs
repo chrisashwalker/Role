@@ -94,8 +94,8 @@ public static class Actions{
     public static void FollowCharacter(UnityCharacter leader, UnityCharacter follower){
         if ((leader.Rigidbody.position - follower.Rigidbody.position).magnitude >= 2 && (leader.Rigidbody.position - follower.Rigidbody.position).magnitude <= 20) {
             follower.Rigidbody.position = Vector3.MoveTowards(follower.Rigidbody.position, leader.Rigidbody.position, 1.0f * Time.fixedDeltaTime);
-            float angle = Vector3.SignedAngle(leader.Rigidbody.position - follower.Rigidbody.position, follower.Rigidbody.position, Vector3.up);
-            follower.Rigidbody.MoveRotation(Quaternion.Euler(0, angle, 0));
+            Quaternion angle = Quaternion.LookRotation(leader.Rigidbody.position - follower.Rigidbody.position);
+            follower.Rigidbody.MoveRotation(angle);
             if (follower.Object.tag == "Enemy" && leader.Object.tag == "Player"){
                 if (follower.LastShot <= Saves.GameData.GameTime - 1){
                     follower.LastShot = Saves.GameData.GameTime;
@@ -108,28 +108,9 @@ public static class Actions{
     public static void ShootProjectile(UnityCharacter shooter, Item usedItem){
         UnityProjectile projectile = new UnityProjectile(usedItem.Identifier);
         ShotProjectiles.Add(projectile);
-        float offsetX, offsetZ;
-        Vector3 direction;
         float speed = 10f;
-        if (shooter.Rigidbody.rotation.eulerAngles.y < 90){
-            offsetX = 0f;
-            offsetZ = 1f;
-            direction = Vector3.forward;
-        } else if (shooter.Rigidbody.rotation.eulerAngles.y < 180){
-            offsetX = 1f;
-            offsetZ = 0f;
-            direction = Vector3.right;
-        } else if  (shooter.Rigidbody.rotation.eulerAngles.y < 270){
-            offsetX = 0f;
-            offsetZ = -1f;
-            direction = Vector3.back;
-        } else {
-            offsetX = -1f;
-            offsetZ = 0f;
-            direction = Vector3.left;
-        }
-        projectile.Origin = new Vector3(shooter.Rigidbody.position.x + offsetX, shooter.Rigidbody.position.y, shooter.Rigidbody.position.z + offsetZ);
-        projectile.Rigidbody.transform.position = projectile.Origin;
-        projectile.Rigidbody.AddForce(direction * speed, ForceMode.Impulse);
+        projectile.Origin = shooter.Rigidbody.position + shooter.Rigidbody.transform.forward;
+        projectile.Rigidbody.transform.SetPositionAndRotation(projectile.Origin, shooter.Rigidbody.rotation);
+        projectile.Rigidbody.AddForce(projectile.Rigidbody.transform.forward * speed, ForceMode.Impulse);
     }
 }
