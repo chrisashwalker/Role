@@ -8,22 +8,30 @@ public static class Controls{
     public static KeyCode UseItem{get;} = KeyCode.Slash;
     public static KeyCode Buy{get;} = KeyCode.LeftBracket;
     public static KeyCode Sell{get;} = KeyCode.RightBracket;
+    public static Vector3 targetPosition = Vector3.zero;
 
     public static void MoveCharacter(UnityCharacter character){
-        if(character.Grounded){
-            character.Rigidbody.velocity = new Vector3(Input.GetAxis("Horizontal") * 10,0,Input.GetAxis("Vertical") * 10);
-            if (character.Rigidbody.velocity.z > 0){
+        float speed = 10.0f;
+        Ray ray = CameraManager.MainCamera.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        LayerMask ground = LayerMask.GetMask("Ground"); 
+        if (character.Grounded){
+            character.Rigidbody.velocity = Vector3.zero;
+            Vector3 inputPosition = new Vector3(Input.GetAxis("Horizontal"),0,Input.GetAxis("Vertical")) * speed;
+            if (inputPosition == Vector3.zero){
+                if (Input.GetMouseButtonDown(0) && Physics.Raycast(ray.origin, ray.direction, out hit, Mathf.Infinity, ground)){
+                    targetPosition = hit.point;
+                } else if (targetPosition != Vector3.zero && character.Rigidbody.position != targetPosition){
+                    character.Rigidbody.position = Vector3.MoveTowards(character.Rigidbody.position, targetPosition, speed * Time.fixedDeltaTime);
+                }
+            } else {
+                targetPosition = Vector3.zero;
+                character.Rigidbody.velocity = inputPosition;
+            }
+            if (character.Rigidbody.velocity != Vector3.zero){
+                Quaternion angle = Quaternion.LookRotation(character.Rigidbody.velocity);
+                character.Rigidbody.MoveRotation(angle);
                 GameController.Instance.anim.SetBool("Moving", true);
-                character.Rigidbody.MoveRotation(Quaternion.Euler(0,0.0f,0));
-            } else if (character.Rigidbody.velocity.z < 0){
-                GameController.Instance.anim.SetBool("Moving", true);
-                character.Rigidbody.MoveRotation(Quaternion.Euler(0,180,0));
-            } else if (character.Rigidbody.velocity.x > 0){
-                GameController.Instance.anim.SetBool("Moving", true);
-                character.Rigidbody.MoveRotation(Quaternion.Euler(0,90.0f,0));
-            } else if (character.Rigidbody.velocity.x < 0){
-                GameController.Instance.anim.SetBool("Moving", true);
-                character.Rigidbody.MoveRotation(Quaternion.Euler(0,270.0f,0));
             } else {
                 GameController.Instance.anim.SetBool("Moving", false);
             }
