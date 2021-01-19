@@ -16,23 +16,20 @@ public static class Controls{
         RaycastHit hit;
         LayerMask ground = LayerMask.GetMask("Ground"); 
         if (character.Grounded){
-            character.Rigidbody.velocity = Vector3.zero;
-            Vector3 inputPosition = new Vector3(Input.GetAxis("Horizontal"),0,Input.GetAxis("Vertical")) * speed;
-            if (inputPosition == Vector3.zero){
-                if (Input.GetMouseButtonDown(0) && Physics.Raycast(ray.origin, ray.direction, out hit, Mathf.Infinity, ground)){
-                    targetPosition = hit.point;
-                } else if (targetPosition != Vector3.zero && character.Rigidbody.position != targetPosition){
-                    character.Rigidbody.position = Vector3.MoveTowards(character.Rigidbody.position, targetPosition, speed * Time.fixedDeltaTime);
-                }
-            } else {
-                targetPosition = Vector3.zero;
-                character.Rigidbody.velocity = inputPosition;
+            Vector3 inputVector = new Vector3(Input.GetAxis("Horizontal"),0,Input.GetAxis("Vertical"));
+            if (inputVector != Vector3.zero){
+                targetPosition = character.Rigidbody.position + inputVector;
+            } else if (Input.GetMouseButtonDown(0) && Physics.Raycast(ray.origin, ray.direction, out hit, Mathf.Infinity, ground)){
+                targetPosition = hit.point;
             }
-            if (character.Rigidbody.velocity != Vector3.zero){
+            if (targetPosition != Vector3.zero && (targetPosition - character.Rigidbody.position).magnitude > 0.1){
+                character.Rigidbody.velocity = (targetPosition - character.Rigidbody.position).normalized * speed;
                 Quaternion angle = Quaternion.LookRotation(character.Rigidbody.velocity);
                 character.Rigidbody.MoveRotation(angle);
                 GameController.Instance.anim.SetBool("Moving", true);
             } else {
+                targetPosition = Vector3.zero;
+                character.Rigidbody.velocity = Vector3.zero;
                 GameController.Instance.anim.SetBool("Moving", false);
             }
         }
