@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class CollisionManager : MonoBehaviour{
     public static GameObject CollidedObject;
+
     private void OnCollisionStay(Collision collision){
         if (collision.gameObject.tag == "Ground"){
             GameController.Instance.Player.Grounded = true;
@@ -17,6 +19,13 @@ public class CollisionManager : MonoBehaviour{
     }
     
     private GameObject CollisionCheck(Collision collision){
+        foreach (UnityProjectile projectile in Actions.ShotProjectiles){
+            if (projectile.Collider == collision.collider){
+                Actions.SpentProjectiles.Add(projectile);
+                GameController.Instance.Player.Health -= 1;
+                GameController.Instance.HealthBar.GetComponent<Slider>().value = GameController.Instance.Player.Health;
+            }
+        }
         foreach (UnityCharacter character in World.CharacterList){
             if (character.Collider == collision.collider && Input.GetKey(Controls.Buy)){
                 Trading.FindSaleItems(GameController.Instance.Player, character);

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameController : MonoBehaviour{
     public static GameController Instance{get;set;}
@@ -10,6 +11,7 @@ public class GameController : MonoBehaviour{
     public GameObject ShortcutCanvas{get;set;}
     public GameObject[] AllShortcutToggles{get;set;}
     public Animator anim;
+    public GameObject HealthBar;
 
     void Awake(){
         Instance = this;
@@ -100,6 +102,9 @@ public class GameController : MonoBehaviour{
             Saves.GameData.AlteredObjects.Remove(po);
         }
         SpentRemovals.Clear();
+        HealthBar.GetComponent<RectTransform>().sizeDelta = new Vector2(10 * Player.MaxHealth, 10);
+        HealthBar.GetComponent<Slider>().maxValue = Player.MaxHealth;
+        HealthBar.GetComponent<Slider>().value = Player.Health;
     }
 
     void FixedUpdate(){
@@ -119,7 +124,7 @@ public class GameController : MonoBehaviour{
         }
         Inventory.ItemUseCheck();
         foreach (UnityProjectile projectile in Actions.ShotProjectiles){
-            if ((projectile.Rigidbody.transform.position - projectile.Origin).magnitude >= projectile.Distance){
+            if ((projectile.Rigidbody.transform.position - projectile.Origin).magnitude >= projectile.Distance || ((projectile.Rigidbody.transform.position - projectile.Origin).magnitude >= 0.1 && projectile.Rigidbody.velocity == Vector3.zero)){
                 Actions.SpentProjectiles.Add(projectile);
             }
         }
@@ -130,6 +135,11 @@ public class GameController : MonoBehaviour{
         Actions.SpentProjectiles.Clear();
         foreach (UnityCharacter enemy in World.EnemyList){
             Actions.FollowCharacter(Player, enemy);
+        }
+        if (Player.Health <= 0){
+            Actions.ShotProjectiles.Clear();
+            Actions.SpentProjectiles.Clear();
+            SceneManager.LoadScene(World.SceneList[Saves.GameData.CurrentLocation]);
         }
     }
 }

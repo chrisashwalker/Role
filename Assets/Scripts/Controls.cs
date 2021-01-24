@@ -30,7 +30,9 @@ public static class Controls{
             } else {
                 targetPosition = Vector3.zero;
                 character.Rigidbody.velocity = Vector3.zero;
-                GameController.Instance.anim.SetBool("Moving", false);
+                if (GameController.Instance.anim.GetBool("Moving")){
+                    GameController.Instance.anim.SetBool("Moving", false);
+                }
             }
         }
     }
