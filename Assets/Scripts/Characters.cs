@@ -48,6 +48,8 @@ public class UnityCharacter : Character{
         Identifier = Object.GetInstanceID();
         if (Object.tag == "Player"){
             Type = CharacterTypes.Player;
+        } else if (Object.tag == "Enemy"){
+            Type = CharacterTypes.Enemy;
         }
         Grounded = false;
         LastShot = 0.0f;

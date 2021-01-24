@@ -9,6 +9,7 @@ public static class World{
     public static List<UnityMapItem> MapItemList{get;set;} = new List<UnityMapItem>();
     public static List<UnityCharacter> CharacterList{get;set;} = new List<UnityCharacter>();
     public static List<UnityCharacter> EnemyList{get;set;} = new List<UnityCharacter>();
+    public static List<UnityCharacter> DefeatedEnemyList{get;set;} = new List<UnityCharacter>();
     public static List<GameObject> TreeList{get;set;} = new List<GameObject>();
     public static List<GameObject> RockList{get;set;} = new List<GameObject>();
 

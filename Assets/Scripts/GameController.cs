@@ -124,7 +124,7 @@ public class GameController : MonoBehaviour{
         }
         Inventory.ItemUseCheck();
         foreach (UnityProjectile projectile in Actions.ShotProjectiles){
-            if ((projectile.Rigidbody.transform.position - projectile.Origin).magnitude >= projectile.Distance || ((projectile.Rigidbody.transform.position - projectile.Origin).magnitude >= 0.1 && projectile.Rigidbody.velocity == Vector3.zero)){
+            if ((projectile.Rigidbody.transform.position - projectile.Origin).magnitude >= projectile.Distance || ((projectile.Rigidbody.transform.position - projectile.Origin).magnitude >= 0.1 && (projectile.Rigidbody.velocity - Vector3.zero).magnitude <= 1)){
                 Actions.SpentProjectiles.Add(projectile);
             }
         }
@@ -135,10 +135,19 @@ public class GameController : MonoBehaviour{
         Actions.SpentProjectiles.Clear();
         foreach (UnityCharacter enemy in World.EnemyList){
             Actions.FollowCharacter(Player, enemy);
+            if (enemy.Health <= 0){
+                World.DefeatedEnemyList.Add(enemy);
+            }
         }
+        foreach (UnityCharacter defeated in World.DefeatedEnemyList){
+            World.EnemyList.Remove(defeated);
+            GameObject.Destroy(defeated.Object);
+        }
+        World.DefeatedEnemyList.Clear();
         if (Player.Health <= 0){
             Actions.ShotProjectiles.Clear();
             Actions.SpentProjectiles.Clear();
+            World.EnemyList.Clear();
             SceneManager.LoadScene(World.SceneList[Saves.GameData.CurrentLocation]);
         }
     }
