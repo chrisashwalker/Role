@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
+using System;
 
 public class CollisionManager : MonoBehaviour{
     public static GameObject CollidedObject;
@@ -19,11 +19,20 @@ public class CollisionManager : MonoBehaviour{
     }
     
     private GameObject CollisionCheck(Collision collision){
+        if (collision.gameObject.tag == "Bed" && Input.GetKey(Controls.Interact) && DateTime.Now >= Saves.LastSave.AddSeconds(3)){
+            GameController.Instance.Player.Health = GameController.Instance.Player.MaxHealth;
+            Saves.GameData.GameDay += 1;
+            Saves.GameData.GameTime = TimeManager.sunrise;
+            Saves.GameData.InventoryItems = GameController.Instance.Player.Storage.StoredItems;
+            Saves.GameData.Funds = GameController.Instance.Player.Coins;
+            Saves.SaveGame(Saves.GameData);
+            Saves.LastSave = DateTime.Now;
+        }
         foreach (UnityProjectile projectile in Actions.ShotProjectiles){
             if (projectile.Collider == collision.collider){
                 Actions.SpentProjectiles.Add(projectile);
                 GameController.Instance.Player.Health -= 1;
-                GameController.Instance.HealthBar.GetComponent<Slider>().value = GameController.Instance.Player.Health;
+                GameController.Instance.Player.Rigidbody.AddForce(new Vector3(0,10,0), ForceMode.Impulse);
             }
         }
         foreach (UnityCharacter character in World.CharacterList){
@@ -39,8 +48,8 @@ public class CollisionManager : MonoBehaviour{
         foreach (UnityGate gate in World.GateList){
             if (gate.Collider == collision.collider && Input.GetKey(Controls.Interact)){
                 Saves.GameData.CurrentLocation = gate.Destination;
-                if (Saves.GameData.FarthestLocation < gate.Destination){
-                    Saves.GameData.FarthestLocation = gate.Destination;
+                if (Saves.GameData.Progress < gate.Destination){
+                    Saves.GameData.Progress = gate.Destination;
                 }
                 World.RockList.Clear();
                 World.TreeList.Clear();

@@ -50,7 +50,7 @@ public static class World{
     }
 
     public static void FastTravel(int sceneNumber){
-        if (Saves.GameData.FarthestLocation >= sceneNumber && Saves.GameData.CurrentLocation != sceneNumber){ 
+        if (Saves.GameData.Progress >= sceneNumber && Saves.GameData.CurrentLocation != sceneNumber){ 
             Saves.GameData.CurrentLocation = sceneNumber;
             World.RockList.Clear();
             World.TreeList.Clear();

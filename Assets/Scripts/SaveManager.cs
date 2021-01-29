@@ -1,18 +1,19 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using System;
 
 using UnityEngine;
 
 public static class Saves{
     public static bool Loaded{get;set;} = false;
+    public static DateTime LastSave{get;set;}
     
     [System.Serializable]
     public class SaveData{
         public int GameDay{get;set;}
         public int Progress{get;set;}
         public int CurrentLocation{get;set;}
-        public int FarthestLocation{get;set;}
         public float GameTime{get;set;}
         public List<Item> InventoryItems{get;set;}
         public List<AlteredObject> AlteredObjects{get;set;}

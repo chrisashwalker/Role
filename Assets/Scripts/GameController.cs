@@ -40,7 +40,7 @@ public class GameController : MonoBehaviour{
             Saves.GameData = new Saves.SaveData();
             Saves.GameData.GameDay = 1;
             Saves.GameData.GameTime = 300.0f;
-            Saves.GameData.FarthestLocation = 1;
+            Saves.GameData.Progress = 1;
             Saves.GameData.CurrentLocation = 1;
             Inventory.LoadStandardItems();
         }
@@ -143,6 +143,7 @@ public class GameController : MonoBehaviour{
             World.EnemyList.Remove(defeated);
             GameObject.Destroy(defeated.Object);
         }
+        HealthBar.GetComponent<Slider>().value = GameController.Instance.Player.Health;
         World.DefeatedEnemyList.Clear();
         if (Player.Health <= 0){
             Actions.ShotProjectiles.Clear();

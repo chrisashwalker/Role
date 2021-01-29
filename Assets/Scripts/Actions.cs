@@ -96,11 +96,17 @@ public static class Actions{
             follower.Rigidbody.position = Vector3.MoveTowards(follower.Rigidbody.position, leader.Rigidbody.position, 1.0f * Time.fixedDeltaTime);
             Quaternion angle = Quaternion.LookRotation(leader.Rigidbody.position - follower.Rigidbody.position);
             follower.Rigidbody.MoveRotation(angle);
-            if (follower.Object.tag == "Enemy" && leader.Object.tag == "Player"){
+            if (follower.Object.tag == "Enemy" && leader.Object.tag == "Player" && (leader.Rigidbody.position - follower.Rigidbody.position).magnitude >= 10){
                 if (follower.LastShot <= Saves.GameData.GameTime - 1){
                     follower.LastShot = Saves.GameData.GameTime;
                     ShootProjectile(follower, ItemList.Bow);
                 }
+            }
+        } else if ((leader.Rigidbody.position - follower.Rigidbody.position).magnitude < 2){
+            if (follower.Object.tag == "Enemy" && leader.Object.tag == "Player" && follower.LastShot <= Saves.GameData.GameTime - 1){
+                    follower.LastShot = Saves.GameData.GameTime;
+                    leader.Health -= 1;
+                    leader.Rigidbody.AddForce(new Vector3(0,10,0), ForceMode.Impulse);
             }
         }
     }
