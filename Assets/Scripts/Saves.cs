@@ -4,10 +4,11 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public static class Saves
 {
-    public static bool Loaded {get;set;}
+    public static Data GameState {get;set;}
     public static DateTime LastSave {get;set;}
     
     [System.Serializable]
@@ -49,21 +50,29 @@ public static class Saves
         stream.Close();
     }
     
-    public static Data LoadGame()
+    public static void LoadGame()
     {
-        if (!Loaded){
+        if (GameState != null)
+        {
             string path = Application.persistentDataPath + "/save.bin";
-            if (File.Exists(path)){
+            if (File.Exists(path))
+            {
                 BinaryFormatter formatter = new BinaryFormatter();
                 FileStream stream = new FileStream(path, FileMode.Open);
                 Data data = (Data) formatter.Deserialize(stream);
                 stream.Close();
-                Loaded = true;
-                return data;
-            } else {
-                return null;
+                GameState = data;
             }
         }
+        else
+        {
+            GameState = new Data();
+            GameState.GameDay = 1;
+            GameState.GameTime = 300.0f;
+            GameState.Progress = 1;
+            GameState.CurrentLocation = 1;
+        }
+        SceneManager.LoadScene(Map.Scenes[GameState.CurrentLocation]);
     }
 
     public static void CheckStatus()
@@ -71,8 +80,7 @@ public static class Saves
         if (Map.Player.Health <= 0)
         {
             Map.DiscardAllObjects();
-            Loaded = false;
-            SceneManager.LoadScene(World.SceneList[Saves.GameData.CurrentLocation]);
+            LoadGame();
         }
     }
 }

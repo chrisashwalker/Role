@@ -101,28 +101,36 @@ public class Items{
     public int MaxCapacity{get;set;} = 10;
     public List<Item> StoredItems{get;set;}  = new List<Item>();
     public int EquippedItemIndex{get;set;} = 0;
-    public static Dictionary<int, Item> GameItemList{get;set;} = new Dictionary<int, Item>();
+    public static Dictionary<int, Item> GameItems {get;set;}
     public static void GetItems(){
-        GameItemList.Add(ItemList.Sword.Identifier, ItemList.Sword);
-        GameItemList.Add(ItemList.Shovel.Identifier, ItemList.Shovel);
-        GameItemList.Add(ItemList.Pickaxe.Identifier, ItemList.Pickaxe);
-        GameItemList.Add(ItemList.Axe.Identifier, ItemList.Axe);
-        GameItemList.Add(ItemList.WateringCan.Identifier, ItemList.WateringCan);
-        GameItemList.Add(ItemList.Bow.Identifier, ItemList.Bow);
-        GameItemList.Add(ItemList.Seed.Identifier, ItemList.Seed);
-        GameItemList.Add(ItemList.Plant.Identifier, ItemList.Plant);
-        GameItemList.Add(ItemList.Wood.Identifier, ItemList.Wood);
-        GameItemList.Add(ItemList.Stone.Identifier, ItemList.Stone);
+        GameItems = new Dictionary<int, Item>();
+        GameItems.Add(ItemList.Sword.Identifier, ItemList.Sword);
+        GameItems.Add(ItemList.Shovel.Identifier, ItemList.Shovel);
+        GameItems.Add(ItemList.Pickaxe.Identifier, ItemList.Pickaxe);
+        GameItems.Add(ItemList.Axe.Identifier, ItemList.Axe);
+        GameItems.Add(ItemList.WateringCan.Identifier, ItemList.WateringCan);
+        GameItems.Add(ItemList.Bow.Identifier, ItemList.Bow);
+        GameItems.Add(ItemList.Seed.Identifier, ItemList.Seed);
+        GameItems.Add(ItemList.Plant.Identifier, ItemList.Plant);
+        GameItems.Add(ItemList.Wood.Identifier, ItemList.Wood);
+        GameItems.Add(ItemList.Stone.Identifier, ItemList.Stone);
+        if (Saves.GameState.InventoryItems.Count > 0)
+        {
+            Map.Player.Storage.StoredItems = Saves.GameState.InventoryItems;
+        }
+        else{
+            Items.LoadStandardItems();
+        }        
     }
 
     public static void LoadStandardItems(){
-        GameController.Instance.Player.Storage.StoredItems.Add(ItemList.Sword);
-        GameController.Instance.Player.Storage.StoredItems.Add(ItemList.Shovel);
-        GameController.Instance.Player.Storage.StoredItems.Add(ItemList.Pickaxe);
-        GameController.Instance.Player.Storage.StoredItems.Add(ItemList.Axe);
-        GameController.Instance.Player.Storage.StoredItems.Add(ItemList.WateringCan);
-        GameController.Instance.Player.Storage.StoredItems.Add(ItemList.Bow);
-        GameController.Instance.Player.Storage.StoredItems.Add(ItemList.Seed);
+        Map.Player.Storage.StoredItems.Add(ItemList.Sword);
+        Map.Player.Storage.StoredItems.Add(ItemList.Shovel);
+        Map.Player.Storage.StoredItems.Add(ItemList.Pickaxe);
+        Map.Player.Storage.StoredItems.Add(ItemList.Axe);
+        Map.Player.Storage.StoredItems.Add(ItemList.WateringCan);
+        Map.Player.Storage.StoredItems.Add(ItemList.Bow);
+        Map.Player.Storage.StoredItems.Add(ItemList.Seed);
     }
 
     public static float toggleWidth = 100.0f;
