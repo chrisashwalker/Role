@@ -32,7 +32,7 @@ public static class Trading{
             Seller.Storage.StoredItems.Remove(tradedItem);
             Buyer.Storage.StoredItems.Add(tradedItem);
             InTrade = false;
-            Inventory.UpdateToggles();
+            Items.UpdateToggles();
         } else {
             InTrade = true;
         }
@@ -56,7 +56,7 @@ public static class Trading{
         foreach (GameObject toggle in GameController.Instance.AllShortcutToggles){
             int toggleIndex = System.Array.IndexOf(GameController.Instance.AllShortcutToggles, toggle);
             float positionFromCenter = toggleIndex - ((float) toggleCount / 2) + 0.5f;
-            toggle.GetComponent<RectTransform>().anchoredPosition = new Vector2(positionFromCenter * Inventory.toggleWidth, Inventory.toggleHeight);
+            toggle.GetComponent<RectTransform>().anchoredPosition = new Vector2(positionFromCenter * Items.toggleWidth, Items.toggleHeight);
         }
     }
 }

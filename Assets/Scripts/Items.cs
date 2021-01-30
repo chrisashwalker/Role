@@ -97,12 +97,12 @@ public sealed class ItemList{
     public static Item Stone = new Item(setIdentifier:9, setName:"Stone");
 }
 
-public class Inventory{
+public class Items{
     public int MaxCapacity{get;set;} = 10;
     public List<Item> StoredItems{get;set;}  = new List<Item>();
     public int EquippedItemIndex{get;set;} = 0;
     public static Dictionary<int, Item> GameItemList{get;set;} = new Dictionary<int, Item>();
-    public static void LoadGameItems(){
+    public static void GetItems(){
         GameItemList.Add(ItemList.Sword.Identifier, ItemList.Sword);
         GameItemList.Add(ItemList.Shovel.Identifier, ItemList.Shovel);
         GameItemList.Add(ItemList.Pickaxe.Identifier, ItemList.Pickaxe);

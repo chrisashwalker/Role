@@ -9,7 +9,7 @@ public class Identifiers : MonoBehaviour{
             newGate.Destination = this.identifier;
             World.GateList.Add(newGate);
         } else if (this.gameObject.tag == "MapItem"){
-            UnityMapItem foundItem = new UnityMapItem(this.gameObject, Inventory.GameItemList[this.identifier]);
+            UnityMapItem foundItem = new UnityMapItem(this.gameObject, Items.GameItemList[this.identifier]);
             World.MapItemList.Add(foundItem);
         }
     }

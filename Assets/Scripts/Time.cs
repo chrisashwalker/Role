@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public static class TimeManager{
+public static class Time{
     public static float dayLength{get;} = 600.0f;
     public static float maxLightIntensity{get;} = 2.0f;
     public static float sunlightTime{get;set;}

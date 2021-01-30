@@ -22,8 +22,8 @@ public class GameController : MonoBehaviour{
         if (World.SceneList.Count == 0){
             World.BuildScenes();
         }
-        if (Inventory.GameItemList.Count == 0){
-            Inventory.LoadGameItems();
+        if (Items.GameItemList.Count == 0){
+            Items.GetItems();
         }
         Saves.GameData = Saves.LoadGame();
         if (Saves.GameData != null){
@@ -42,12 +42,12 @@ public class GameController : MonoBehaviour{
             Saves.GameData.GameTime = 300.0f;
             Saves.GameData.Progress = 1;
             Saves.GameData.CurrentLocation = 1;
-            Inventory.LoadStandardItems();
+            Items.LoadStandardItems();
         }
         Player.Storage.EquippedItemIndex = 0;
         ShortcutCanvas = GameObject.FindWithTag("ShortcutCanvas");
         AllShortcutToggles = GameObject.FindGameObjectsWithTag("ShortcutToggle");
-        Inventory.UpdateToggles();
+        Items.UpdateToggles();
         World.FindObjects();
     }
 
@@ -122,7 +122,7 @@ public class GameController : MonoBehaviour{
         } else if (Input.GetKeyDown(KeyCode.Alpha2)){
             World.FastTravel(2);
         }
-        Inventory.ItemUseCheck();
+        Items.ItemUseCheck();
         foreach (UnityProjectile projectile in Actions.ShotProjectiles){
             if ((projectile.Rigidbody.transform.position - projectile.Origin).magnitude >= projectile.Distance || ((projectile.Rigidbody.transform.position - projectile.Origin).magnitude >= 0.1 && (projectile.Rigidbody.velocity - Vector3.zero).magnitude <= 1)){
                 Actions.SpentProjectiles.Add(projectile);

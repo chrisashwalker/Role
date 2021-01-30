@@ -66,7 +66,7 @@ public class CollisionManager : MonoBehaviour{
                 Destroy(mapItem.Object);
                 Saves.GameData.AlteredObjects.Add(new AlteredObject("Removal", mapItem.Object.name, SceneManager.GetActiveScene(), mapItem.Object.transform.position, mapItem.Object.GetInstanceID()));
                 GameController.Instance.Player.Storage.StoredItems.Add(mapItem.linkedItem);
-                Inventory.UpdateToggles();
+                Items.UpdateToggles();
                 return null;
             }
         }

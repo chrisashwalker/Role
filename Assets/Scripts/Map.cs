@@ -1,52 +1,54 @@
 using System.Collections.Generic;
-
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public static class World{
-    public static Dictionary<int, string> SceneList{get;set;} = new Dictionary<int, string>();
+public static class Map
+{    
+    public static UnityCharacter Player{get;set;}
+    public static List<UnityCharacter> Characters{get;set;}
+    public static List<UnityCharacter> Enemies{get;set;}
     public static List<UnityGate> GateList{get;set;} = new List<UnityGate>();
     public static List<UnityMapItem> MapItemList{get;set;} = new List<UnityMapItem>();
-    public static List<UnityCharacter> CharacterList{get;set;} = new List<UnityCharacter>();
-    public static List<UnityCharacter> EnemyList{get;set;} = new List<UnityCharacter>();
+    
     public static List<UnityCharacter> DefeatedEnemyList{get;set;} = new List<UnityCharacter>();
-    public static List<GameObject> TreeList{get;set;} = new List<GameObject>();
-    public static List<GameObject> RockList{get;set;} = new List<GameObject>();
+    public static List<GameObject> Trees{get;set;} = new List<GameObject>();
+    public static List<GameObject> Rocks{get;set;} = new List<GameObject>();
 
-    public static void BuildScenes(){
-        SceneList.Add(0, "0_Home");
-        SceneList.Add(1, "1_Field");
-        SceneList.Add(2, "2_Village");
-        SceneList.Add(3, "3_Wood");
-        SceneList.Add(4, "4_Quarry");
-        SceneList.Add(5, "5_Lake");
-    }
-
-    public static void FindCharacters(){
-        GameController.Instance.Player = new UnityCharacter(GameObject.FindGameObjectWithTag("Player"));
+    public static void GetCharacters(){
+        Player = new UnityCharacter(GameObject.FindGameObjectWithTag("Player"));
+        Characters = new List<UnityCharacter>();
         foreach (GameObject character in GameObject.FindGameObjectsWithTag("Character")){
             UnityCharacter newCharacter = new UnityCharacter(character);
-            CharacterList.Add(newCharacter);
+            Characters.Add(newCharacter);
         }
+        Enemies = new List<UnityCharacter>();
         foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy")){
             UnityCharacter newEnemy = new UnityCharacter(enemy);
-            EnemyList.Add(newEnemy);
+            Enemies.Add(newEnemy);
         }
     }
 
-    public static void FindObjects(){
-        RockList.Clear();
-        TreeList.Clear();
+    public static void GetObjects(){
+        Rocks.Clear();
+        Trees.Clear();
         foreach (GameObject rock in GameObject.FindGameObjectsWithTag("Rock")){
-            if (RockList.Contains(rock) == false){
-                RockList.Add(rock);
+            if (Rocks.Contains(rock) == false){
+                Rocks.Add(rock);
             }
         }
         foreach (GameObject tree in GameObject.FindGameObjectsWithTag("Tree")){
-            if (TreeList.Contains(tree) == false){
-                TreeList.Add(tree);
+            if (Trees.Contains(tree) == false){
+                Trees.Add(tree);
             }
         }
+    }
+
+    public static void DiscardAllObjects()
+    {
+        Map.ShotProjectiles.Clear();
+        Map.SpentProjectiles.Clear();
+        Map.Characters.Clear();
+        Map.Enemies.Clear();
     }
 
     public static void FastTravel(int sceneNumber){
@@ -55,7 +57,7 @@ public static class World{
             World.RockList.Clear();
             World.TreeList.Clear();
             World.MapItemList.Clear();
-            SceneManager.LoadScene(SceneList[sceneNumber], LoadSceneMode.Single);
+            SceneManager.LoadScene(Scenes[sceneNumber], LoadSceneMode.Single);
             Saves.GameData.InventoryItems = GameController.Instance.Player.Storage.StoredItems;
             Saves.GameData.Funds = GameController.Instance.Player.Coins;
             Saves.SaveGame(Saves.GameData);

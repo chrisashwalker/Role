@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public static class Controls{
+public static class Control{
     public static KeyCode MapZoom{get;} = KeyCode.V;
     public static KeyCode Interact{get;} = KeyCode.E;
     public static KeyCode ScrollLeft{get;} = KeyCode.Comma;
