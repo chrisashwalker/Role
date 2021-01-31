@@ -59,7 +59,7 @@ public static class Saves
     
     public static void LoadGame()
     {
-        if (GameState != null)
+        if (GameState == null)
         {
             string path = Application.persistentDataPath + "/save.bin";
             if (File.Exists(path))
@@ -69,17 +69,17 @@ public static class Saves
                 Data data = (Data) formatter.Deserialize(stream);
                 stream.Close();
                 GameState = data;
+            } 
+            else
+            {
+                GameState = new Data();
+                GameState.GameDay = 1;
+                GameState.GameTime = 300.0f;
+                GameState.Progress = 0;
+                GameState.CurrentLocation = 0;
             }
+            SceneManager.LoadScene(Map.Scenes[GameState.CurrentLocation]);
         }
-        else
-        {
-            GameState = new Data();
-            GameState.GameDay = 1;
-            GameState.GameTime = 300.0f;
-            GameState.Progress = 0;
-            GameState.CurrentLocation = 0;
-        }
-        SceneManager.LoadScene(Map.Scenes[GameState.CurrentLocation]);
     }
 
     public static void CheckStatus()
@@ -87,6 +87,7 @@ public static class Saves
         if (Map.Player.Health <= 0)
         {
             Map.DiscardAllObjects();
+            GameState = null;
             LoadGame();
         }
     }

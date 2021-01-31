@@ -70,6 +70,7 @@ public class UI : MonoBehaviour, IPointerClickHandler
     public static void LoadHUD()
     {
         ShortcutCanvas = GameObject.FindWithTag("ShortcutCanvas");
+        AllShortcutToggles = new GameObject[0];
         Items.UpdateToggles();
         HealthBar = GameObject.FindGameObjectWithTag("Health");
         HealthBar.GetComponent<RectTransform>().sizeDelta = new Vector2(10 * Map.Player.MaxHealth, 10);

@@ -204,7 +204,7 @@ public class Items
         {
             if (clickedToggle.GetComponentInChildren<Text>().text == item.Name)
             {
-                Map.Player.Storage.EquippedItemIndex = character.Storage.StoredItems.IndexOf(item);
+                character.Storage.EquippedItemIndex = character.Storage.StoredItems.IndexOf(item);
                 break;
             }
         }
