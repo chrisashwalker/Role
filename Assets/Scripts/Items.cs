@@ -161,7 +161,7 @@ public class Items
         foreach (Item item in Map.Player.Storage.StoredItems)
         {
             GameObject newToggleObject = GameObject.Instantiate(Resources.Load<GameObject>("ShortcutToggle"));
-            newToggleObject.tag = "ShortcutToggle";
+            newToggleObject.tag = Tags.ShortcutToggle;
             newToggleObject.transform.SetParent(UI.ShortcutCanvas.transform, false);
             string itemLabel;
             int itemDurability;
@@ -184,7 +184,7 @@ public class Items
             }
             newToggleObject.GetComponentInChildren<Text>().text = itemLabel;
         }
-        UI.AllShortcutToggles = GameObject.FindGameObjectsWithTag("ShortcutToggle");
+        UI.AllShortcutToggles = GameObject.FindGameObjectsWithTag(Tags.ShortcutToggle);
         int toggleCount = UI.AllShortcutToggles.Length;
         foreach (GameObject toggle in UI.AllShortcutToggles)
         {

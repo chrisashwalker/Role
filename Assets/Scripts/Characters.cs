@@ -37,12 +37,12 @@ public abstract class Character
 
 public class UnityCharacter : Character
 {
-    public GameObject Object {get;set;}
-    public Rigidbody Rigidbody {get;set;}
-    public Collider Collider {get;set;}
-    public int Identifier {get;set;}
-    public bool Grounded {get;set;}
-    public float LastShot {get;set;}
+    public GameObject Object {get; set;}
+    public Rigidbody Rigidbody {get; set;}
+    public Collider Collider {get; set;}
+    public int Identifier {get; set;}
+    public bool Grounded {get; set;}
+    public float TimeOfLastAction {get; set;}
 
     public UnityCharacter(GameObject go)
     {
@@ -51,14 +51,14 @@ public class UnityCharacter : Character
         Rigidbody = Object.GetComponent<Rigidbody>();
         Collider = Object.GetComponent<Collider>();
         Identifier = Object.GetInstanceID();
-        if (Object.tag == "Player")
+        if (Object.tag == Tags.Player)
         {
             Type = CharacterTypes.Player;
-        } else if (Object.tag == "Enemy")
+        } else if (Object.tag == Tags.Enemy)
         {
             Type = CharacterTypes.Enemy;
         }
         Grounded = false;
-        LastShot = 0.0f;
+        TimeOfLastAction = 0.0f;
     }
 }

@@ -8,7 +8,7 @@ public class Collisions : MonoBehaviour
 
     private void OnCollisionStay(Collision collision)
     {
-        if (collision.gameObject.tag == "Ground" && this.gameObject.tag == "Player")        
+        if (collision.gameObject.tag == Tags.Ground && this.gameObject.tag == Tags.Player)        
         {
             Map.Player.Grounded = true;
         }
@@ -17,7 +17,7 @@ public class Collisions : MonoBehaviour
 
     private void OnCollisionExit(Collision collision)
     {
-        if (collision.gameObject.tag == "Ground" && this.gameObject.tag == "Player")
+        if (collision.gameObject.tag == Tags.Ground && this.gameObject.tag == Tags.Player)
         {
             Map.Player.Grounded = false;
         }
@@ -25,7 +25,7 @@ public class Collisions : MonoBehaviour
     
     private GameObject CollisionCheck(Collision collision)
     {
-        if (collision.gameObject.tag == "Bed" && Input.GetKey(Control.Interact) && DateTime.Now >= Saves.LastSave.AddSeconds(3))
+        if (collision.gameObject.tag == Tags.Bed && Input.GetKey(Control.Interact) && DateTime.Now >= Saves.LastSave.AddSeconds(3))
         {
             Map.Player.Health = Map.Player.MaxHealth;
             Saves.GameState.GameDay += 1;
@@ -41,12 +41,12 @@ public class Collisions : MonoBehaviour
             if (projectile.Collider == collision.collider)
             {
                 Map.SpentProjectiles.Add(projectile);
-                if (gameObject.tag == "Player")
+                if (gameObject.tag == Tags.Player)
                 {
                    Map.Player.Health -= 1;
                 Map.Player.Rigidbody.AddForce(new Vector3(0,10,0), ForceMode.Impulse); 
                 }
-                else if (gameObject.tag == "Enemy")
+                else if (gameObject.tag == Tags.Enemy)
                 {
                     foreach (UnityCharacter enemy in Map.Enemies)
                     {

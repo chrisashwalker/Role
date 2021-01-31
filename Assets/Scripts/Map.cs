@@ -31,15 +31,15 @@ public static class Map
 
     public static void GetCharacters()
     {
-        Player = new UnityCharacter(GameObject.FindGameObjectWithTag("Player"));
+        Player = new UnityCharacter(GameObject.FindGameObjectWithTag(Tags.Player));
         Characters = new List<UnityCharacter>();
-        foreach (GameObject character in GameObject.FindGameObjectsWithTag("Character"))
+        foreach (GameObject character in GameObject.FindGameObjectsWithTag(Tags.Character))
         {
             UnityCharacter newCharacter = new UnityCharacter(character);
             Characters.Add(newCharacter);
         }
         Enemies = new List<UnityCharacter>();
-        foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy"))
+        foreach (GameObject enemy in GameObject.FindGameObjectsWithTag(Tags.Enemy))
         {
             UnityCharacter newEnemy = new UnityCharacter(enemy);
             Enemies.Add(newEnemy);
@@ -50,14 +50,14 @@ public static class Map
     {
         Rocks = new List<GameObject>();
         Trees = new List<GameObject>();
-        foreach (GameObject rock in GameObject.FindGameObjectsWithTag("Rock"))
+        foreach (GameObject rock in GameObject.FindGameObjectsWithTag(Tags.Rock))
         {
             if (Rocks.Contains(rock) == false)
             {
                 Rocks.Add(rock);
             }
         }
-        foreach (GameObject tree in GameObject.FindGameObjectsWithTag("Tree"))
+        foreach (GameObject tree in GameObject.FindGameObjectsWithTag(Tags.Tree))
         {
             if (Trees.Contains(tree) == false){
                 Trees.Add(tree);

@@ -11,13 +11,15 @@ public static class Control
     public static KeyCode Buy {get;} = KeyCode.LeftBracket;
     public static KeyCode Sell {get;} = KeyCode.RightBracket;
     public static Vector3 TargetPosition {get; set;} = Vector3.zero;
+    public static LayerMask InteractiveLayer {get; set;}
+    public static float ProjectileSpeed {get; set;} = 10.0f;
 
     public static void MoveCharacter(UnityCharacter character)
     {
         float speed = 10.0f;
         Ray ray = UI.MainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
-        LayerMask ground = LayerMask.GetMask("Ground"); 
+        LayerMask ground = LayerMask.GetMask(Tags.Ground); 
         if (character.Grounded){
             Vector3 inputVector = new Vector3(Input.GetAxis("Horizontal"),0,Input.GetAxis("Vertical"));
             if (inputVector != Vector3.zero){
@@ -32,15 +34,15 @@ public static class Control
                 character.Rigidbody.velocity = (TargetPosition - character.Rigidbody.position).normalized * speed;
                 Quaternion angle = Quaternion.LookRotation(character.Rigidbody.velocity);
                 character.Rigidbody.MoveRotation(angle);
-                character.Object.GetComponent<Animator>().SetBool("Moving", true);
+                character.Object.GetComponent<Animator>().SetBool(Tags.Moving, true);
             } 
             else 
             {
                 TargetPosition = Vector3.zero;
                 character.Rigidbody.velocity = Vector3.zero;
-                if (character.Object.GetComponent<Animator>().GetBool("Moving"))
+                if (character.Object.GetComponent<Animator>().GetBool(Tags.Moving))
                 {
-                    character.Object.GetComponent<Animator>().SetBool("Moving", false);
+                    character.Object.GetComponent<Animator>().SetBool(Tags.Moving, false);
                 }
             }
         }
@@ -61,12 +63,9 @@ public static class Control
         Items.ItemUseCheck();
     }
 
-    public static LayerMask InteractiveLayer {get; set;}
-    public static float cellSize {get;} = 1.0f;
-
     public static void GetLayers()
     {
-        InteractiveLayer = LayerMask.GetMask("Interactive");
+        InteractiveLayer = LayerMask.GetMask(Tags.Interactable);
     }
 
     public static void UseTool(GameObject collidedObject)
@@ -83,14 +82,14 @@ public static class Control
         {
             if (UsedToolFunction.Equals(ToolFunctions.WATER))
             {
-                GameObject Soil = GameObject.Instantiate(Resources.Load<GameObject>("Soil"));
+                GameObject Soil = GameObject.Instantiate(Resources.Load<GameObject>(Tags.Soil));
                 Soil.transform.position = UI.Target.transform.position;
                 Saves.GameState.AlteredObjects.Add(new AlteredObject("Addition", Soil.name, SceneManager.GetActiveScene(), Soil.transform.position, Soil.GetInstanceID()));
             }
         } 
         else 
         {
-            if (UsedToolFunction.Equals(ToolFunctions.SEED) && hitCollider.tag == "Soil")
+            if (UsedToolFunction.Equals(ToolFunctions.SEED) && hitCollider.tag == Tags.Soil)
             {
                 Saves.GameState.AlteredObjects.Remove(Saves.GameState.AlteredObjects.Find(x => x.Identifier.Equals(hitCollider.GetInstanceID())));
                 GameObject.Destroy(hitCollider);
@@ -109,7 +108,7 @@ public static class Control
             } 
             else if (Map.Player.Storage.MaxCapacity > Map.Player.Storage.StoredItems.Count)
             {
-                if (UsedToolFunction.Equals(ToolFunctions.SHOVEL) && hitCollider.tag == "Plant")
+                if (UsedToolFunction.Equals(ToolFunctions.SHOVEL) && hitCollider.tag == Tags.Plant)
                 {
                     GameObject.Destroy(hitCollider);
                     Saves.GameState.AlteredObjects.Remove(Saves.GameState.AlteredObjects.Find(x => x.Identifier.Equals(hitCollider.GetInstanceID())));
@@ -132,14 +131,14 @@ public static class Control
                         Map.Player.Storage.StoredItems.Add(ItemList.Plant);
                     }
                 } 
-                else if (hitCollider.tag == "Rock" && UsedToolFunction.Equals(ToolFunctions.PICKAXE) && Input.GetKey(Control.UseItem))
+                else if (hitCollider.tag == Tags.Rock && UsedToolFunction.Equals(ToolFunctions.PICKAXE) && Input.GetKey(Control.UseItem))
                 {
                     Saves.GameState.AlteredObjects.Add(new AlteredObject("Removal", hitCollider.gameObject.name, SceneManager.GetActiveScene(), hitCollider.gameObject.transform.position, hitCollider.gameObject.GetInstanceID()));
                     GameObject.Destroy(hitCollider);
                     Map.Rocks.Remove(hitCollider);
                     Map.Player.Storage.StoredItems.Add(ItemList.Stone);
                 } 
-                else if (hitCollider.tag == "Tree" && UsedToolFunction.Equals(ToolFunctions.AXE) && Input.GetKey(Control.UseItem))
+                else if (hitCollider.tag == Tags.Tree && UsedToolFunction.Equals(ToolFunctions.AXE) && Input.GetKey(Control.UseItem))
                 {
                     Saves.GameState.AlteredObjects.Add(new AlteredObject("Removal", hitCollider.gameObject.name, SceneManager.GetActiveScene(), hitCollider.gameObject.transform.position, hitCollider.gameObject.GetInstanceID()));
                     GameObject.Destroy(hitCollider);
@@ -157,19 +156,19 @@ public static class Control
             follower.Rigidbody.position = Vector3.MoveTowards(follower.Rigidbody.position, leader.Rigidbody.position, 1.0f * Time.fixedDeltaTime);
             Quaternion angle = Quaternion.LookRotation(leader.Rigidbody.position - follower.Rigidbody.position);
             follower.Rigidbody.MoveRotation(angle);
-            if (follower.Object.tag == "Enemy" && leader.Object.tag == "Player" && (leader.Rigidbody.position - follower.Rigidbody.position).magnitude >= 10)
+            if (follower.Object.tag == Tags.Enemy && leader.Object.tag == Tags.Player && (leader.Rigidbody.position - follower.Rigidbody.position).magnitude >= 10)
             {
-                if (follower.LastShot <= Saves.GameState.GameTime - 1)
+                if (follower.TimeOfLastAction <= Saves.GameState.GameTime - 1)
                 {
-                    follower.LastShot = Saves.GameState.GameTime;
+                    follower.TimeOfLastAction = Saves.GameState.GameTime;
                     ShootProjectile(follower, ItemList.Bow);
                 }
             }
         } else if ((leader.Rigidbody.position - follower.Rigidbody.position).magnitude < 2)
         {
-            if (follower.Object.tag == "Enemy" && leader.Object.tag == "Player" && follower.LastShot <= Saves.GameState.GameTime - 1)
+            if (follower.Object.tag == Tags.Enemy && leader.Object.tag == Tags.Player && follower.TimeOfLastAction <= Saves.GameState.GameTime - 1)
             {
-                    follower.LastShot = Saves.GameState.GameTime;
+                    follower.TimeOfLastAction = Saves.GameState.GameTime;
                     leader.Health -= 1;
                     leader.Rigidbody.AddForce(new Vector3(0,10,0), ForceMode.Impulse);
             }
