@@ -134,6 +134,15 @@ public static class Map
         SpentRemovals.Clear();
     }
 
+    public static void InitialiseLists()
+    {
+        ShotProjectiles = new List<UnityProjectile>();
+        SpentProjectiles = new List<UnityProjectile>();
+        Gates = new List<UnityGate>();
+        MapItems = new List<UnityMapItem>();
+        DefeatedEnemies = new List<UnityCharacter>();
+    }
+
     public static void DiscardObsoleteObjects()
     {
         foreach (UnityProjectile projectile in ShotProjectiles)

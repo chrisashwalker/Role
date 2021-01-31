@@ -1,21 +1,22 @@
 using UnityEngine;
 
-class Init : MonoBehaviour
+public class Core : MonoBehaviour
 {
-    void Start()
+    public void Start()
     {
         Map.GetScenes();
-        Map.GetCharacters();
         Saves.LoadGame();
-        Items.GetItems();
-        Map.GetObjects();
         UI.GetMainCamera();
         Timeflow.GetSunlight();
         Control.GetLayers();
+        Map.InitialiseLists();
+        Map.GetCharacters();
+        Items.GetItems();
+        Map.GetObjects();
         UI.LoadHUD();
     }
 
-    void FixedUpdate()
+    public void FixedUpdate()
     {
         Control.MoveCharacter(Map.Player);
         UI.RelocateCamera();
@@ -25,7 +26,7 @@ class Init : MonoBehaviour
         Saves.CheckStatus();
     }
 
-    void Update()
+    public void Update()
     {
         Control.GetKeyPress();
         Timeflow.Tick();

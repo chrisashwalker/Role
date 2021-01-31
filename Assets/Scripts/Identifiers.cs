@@ -2,19 +2,19 @@ using UnityEngine;
 
 public class Identifiers : MonoBehaviour
 {
-    public int Identifier {get; set;}
+    public int identifier;
 
     void Start()
     {
         if (this.gameObject.tag == "Gate")
         {
             UnityGate newGate = new UnityGate(this.gameObject);
-            newGate.Destination = this.Identifier;
+            newGate.Destination = this.identifier;
             Map.Gates.Add(newGate);
         } 
         else if (this.gameObject.tag == "MapItem")
         {
-            UnityMapItem foundItem = new UnityMapItem(this.gameObject, Items.GameItems[this.Identifier]);
+            UnityMapItem foundItem = new UnityMapItem(this.gameObject, Items.GameItems[this.identifier]);
             Map.MapItems.Add(foundItem);
         }
     }

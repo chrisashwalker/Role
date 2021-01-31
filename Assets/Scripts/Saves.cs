@@ -8,8 +8,8 @@ using UnityEngine.SceneManagement;
 
 public static class Saves
 {
-    public static Data GameState {get;set;}
-    public static DateTime LastSave {get;set;}
+    public static Data GameState {get; set;}
+    public static DateTime LastSave {get; set;}
     
     [System.Serializable]
     public class Data
@@ -29,7 +29,14 @@ public static class Saves
             Progress = setProgress;
             CurrentLocation = setLocation;
             Funds = setFunds;
-            InventoryItems = setInventoryItems;
+            if (setInventoryItems != null)
+            {
+                InventoryItems = setInventoryItems;
+            } 
+            else 
+            {
+                InventoryItems = new List<Item>();
+            }
             if (setAlteredObjects != null)
             {
                 AlteredObjects = setAlteredObjects;
@@ -69,8 +76,8 @@ public static class Saves
             GameState = new Data();
             GameState.GameDay = 1;
             GameState.GameTime = 300.0f;
-            GameState.Progress = 1;
-            GameState.CurrentLocation = 1;
+            GameState.Progress = 0;
+            GameState.CurrentLocation = 0;
         }
         SceneManager.LoadScene(Map.Scenes[GameState.CurrentLocation]);
     }
