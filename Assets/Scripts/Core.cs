@@ -10,7 +10,7 @@ class Init : MonoBehaviour
         Items.GetItems();
         Map.GetObjects();
         UI.GetMainCamera();
-        Time.GetSunlight();
+        Timeflow.GetSunlight();
         Control.GetLayers();
         UI.LoadHUD();
     }
@@ -28,6 +28,6 @@ class Init : MonoBehaviour
     void Update()
     {
         Control.GetKeyPress();
-        Time.Tick();
+        Timeflow.Tick();
     }
 }

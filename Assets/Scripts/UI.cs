@@ -1,14 +1,16 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class UI : MonoBehaviour, IPointerClickHandler
 {
-    public static Camera MainCamera {get;set;}
-    public static float DefaultCameraSize {get;set;}
-    public static GameObject Target{get;set;}
-    public static GameObject ShortcutCanvas {get;set;}
-    public static GameObject[] AllShortcutToggles {get;set;}
-    public static GameObject HealthBar;
+    public static Camera MainCamera {get; set;}
+    public static float DefaultCameraSize {get; set;}
+    public static GameObject Target {get; set;}
+    public static int cellSize = 1;
+    public static GameObject ShortcutCanvas {get; set;}
+    public static GameObject[] AllShortcutToggles {get; set;}
+    public static GameObject HealthBar {get; set;}
 
     public static void GetMainCamera()
     {
@@ -62,7 +64,7 @@ public class UI : MonoBehaviour, IPointerClickHandler
         AllShortcutToggles = GameObject.FindGameObjectsWithTag("ShortcutToggle");
         Items.UpdateToggles();
         HealthBar = GameObject.FindGameObjectWithTag("Health");
-        HealthBar.GetComponent<RectTransform>().sizeDelta = new Vector2(10 * Player.MaxHealth, 10);
+        HealthBar.GetComponent<RectTransform>().sizeDelta = new Vector2(10 * Map.Player.MaxHealth, 10);
         HealthBar.GetComponent<Slider>().maxValue = Map.Player.MaxHealth;
         HealthBar.GetComponent<Slider>().value = Map.Player.Health;
     }
@@ -75,10 +77,36 @@ public class UI : MonoBehaviour, IPointerClickHandler
     public void OnPointerClick(PointerEventData pointerEventData)
     {
         GameObject clickedToggle = pointerEventData.pointerPress;
-        if (clickedToggle.tag == "ShortcutToggle" && Trading.InTrade == false){
+        if (clickedToggle.tag == "ShortcutToggle" && !Trading.InTrade){
             Items.Equip(Map.Player, clickedToggle);
-        } else if (clickedToggle.tag == "ShortcutToggle" && Trading.InTrade == true){
+        } else if (clickedToggle.tag == "ShortcutToggle" && Trading.InTrade){
             Trading.TradeItem(clickedToggle);
+        }
+    }
+
+     public static void LaunchTrading()
+     {
+        foreach (GameObject toggle in AllShortcutToggles)
+        {
+            toggle.SetActive(false);
+            GameObject.Destroy(toggle);
+        }
+        foreach (Item item in Trading.SaleItems)
+        {
+            GameObject newToggleObject = GameObject.Instantiate(Resources.Load<GameObject>("ShortcutToggle"));
+            newToggleObject.tag = "ShortcutToggle";
+            newToggleObject.transform.SetParent(ShortcutCanvas.transform, false);
+            string itemLabel;
+            itemLabel = item.Name + " : " + item.Value;
+            newToggleObject.GetComponentInChildren<Text>().text = itemLabel;
+        }
+        AllShortcutToggles = GameObject.FindGameObjectsWithTag("ShortcutToggle");
+        int toggleCount = AllShortcutToggles.Length;
+        foreach (GameObject toggle in AllShortcutToggles)
+        {
+            int toggleIndex = System.Array.IndexOf(AllShortcutToggles, toggle);
+            float positionFromCenter = toggleIndex - ((float) toggleCount / 2) + 0.5f;
+            toggle.GetComponent<RectTransform>().anchoredPosition = new Vector2(positionFromCenter * Items.toggleWidth, Items.toggleHeight);
         }
     }
 }

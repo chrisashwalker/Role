@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public static class Time
+public static class Timeflow
 {
     public static Light Sunlight {get;set;}  
     public static float MaxSunlightIntensity {get;} = 2.0f;
@@ -17,19 +17,19 @@ public static class Time
 
     public static void Tick()
     {
-        Saves.Data.GameTime += Time.deltaTime;
-        SunlightTime = Saves.GameData.GameTime - Sunrise;
-        if (Saves.GameData.GameTime > Sunrise && Saves.GameData.GameTime < Sunset){
+        Saves.GameState.GameTime += Time.deltaTime;
+        SunlightTime = Saves.GameState.GameTime - Sunrise;
+        if (Saves.GameState.GameTime > Sunrise && Saves.GameState.GameTime < Sunset){
             Sunlight.intensity = 0.2f + MaxSunlightIntensity - System.Math.Abs((Sunrise - SunlightTime) * SunlightRate);
         } else {
             Sunlight.intensity = 0.2f;
         }
-        if (Saves.GameData.GameTime >= DayLength){
-            Saves.GameData.GameDay += 1;
-            foreach (AlteredObject ao in Saves.GameData.AlteredObjects){
+        if (Saves.GameState.GameTime >= DayLength){
+            Saves.GameState.GameDay += 1;
+            foreach (AlteredObject ao in Saves.GameState.AlteredObjects){
                 ao.DaysAltered += 1;
             }
-            Saves.GameData.GameTime = 0.0f;
+            Saves.GameState.GameTime = 0.0f;
         }
     }
 }
