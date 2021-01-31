@@ -7,7 +7,7 @@ public class UI : MonoBehaviour, IPointerClickHandler
     public static Camera MainCamera {get; set;}
     public static float DefaultCameraSize {get; set;}
     public static GameObject Target {get; set;}
-    public static int cellSize = 1;
+    public static int CellSize {get; set;} = 1;
     public static GameObject ShortcutCanvas {get; set;}
     public static GameObject[] AllShortcutToggles {get; set;}
     public static GameObject HealthBar {get; set;}
@@ -27,24 +27,30 @@ public class UI : MonoBehaviour, IPointerClickHandler
         if (Target == null){
             Target = GameObject.Instantiate(Resources.Load<GameObject>("Target"));
         }
-        float targetX, targetY, targetZ, cellsAlongX, cellsAlongZ;
+        float targetX, targetY, targetZ, cellsAlongX, cellsAlongZ, cellSizeOffset;
         targetY = 0.04f;
-        cellsAlongX = Map.Player.Rigidbody.position.x / cellsize;
-        cellsAlongZ = Map.Player.Rigidbody.position.z / cellsize;
+        cellsAlongX = Map.Player.Rigidbody.position.x / CellSize;
+        cellsAlongZ = Map.Player.Rigidbody.position.z / CellSize;
+        cellSizeOffset = CellSize;
         if (Map.Player.Rigidbody.rotation.eulerAngles.y < 90){
-            targetX = (float) System.Math.Floor(cellsAlongX) * cellSize + cellSize;
-            targetZ = (float) System.Math.Ceiling(cellsAlongZ) * cellSize + cellSize;
-        } else if  (Map.Player.Rigidbody.rotation.eulerAngles.y < 180){
-            targetX = (float) System.Math.Ceiling(cellsAlongX) * cellSize + cellSize;
-            targetZ = (float) System.Math.Floor(cellsAlongZ) * cellSize + cellSize;
-        } else if (Map.Player.Rigidbody.rotation.eulerAngles.y < 270){
-            targetX = (float) System.Math.Floor(cellsAlongX) * cellSize + cellSize;
-            targetZ = (float) System.Math.Floor(cellsAlongZ) * cellSize - cellSize;
-        } else {
-            targetX = (float) System.Math.Floor(cellsAlongX) * cellSize - cellSize;
-            targetZ = (float) System.Math.Floor(cellsAlongZ) * cellSize + cellSize;
+            cellsAlongZ = (float) System.Math.Ceiling(cellsAlongZ);
         }
-
+        else if (Map.Player.Rigidbody.rotation.eulerAngles.y >= 90 && Map.Player.Rigidbody.rotation.eulerAngles.y < 180)
+        {
+            cellsAlongX = (float) System.Math.Ceiling(cellsAlongX);
+        }
+        cellsAlongX = (float) System.Math.Floor(cellsAlongX);
+        cellsAlongZ = (float) System.Math.Floor(cellsAlongZ);
+        targetX = (float) System.Math.Floor(cellsAlongX) * CellSize + CellSize;
+        targetZ = (float) System.Math.Ceiling(cellsAlongZ) * CellSize + CellSize;
+        if (Map.Player.Rigidbody.rotation.eulerAngles.y >= 180 && Map.Player.Rigidbody.rotation.eulerAngles.y < 270)
+        {
+            targetZ -= cellSizeOffset * 2;
+        } 
+        else if (Map.Player.Rigidbody.rotation.eulerAngles.y >= 270)
+        {
+            targetX -= cellSizeOffset * 2;
+        }
         Target.transform.position = new Vector3(targetX,targetY,targetZ);
         Target.transform.rotation = Map.Player.Rigidbody.rotation;
     }
@@ -64,7 +70,6 @@ public class UI : MonoBehaviour, IPointerClickHandler
     public static void LoadHUD()
     {
         ShortcutCanvas = GameObject.FindWithTag("ShortcutCanvas");
-        AllShortcutToggles = GameObject.FindGameObjectsWithTag("ShortcutToggle");
         Items.UpdateToggles();
         HealthBar = GameObject.FindGameObjectWithTag("Health");
         HealthBar.GetComponent<RectTransform>().sizeDelta = new Vector2(10 * Map.Player.MaxHealth, 10);
