@@ -54,7 +54,8 @@ public class UnityCharacter : Character
         if (Object.tag == Tags.Player)
         {
             Type = CharacterTypes.Player;
-        } else if (Object.tag == Tags.Enemy)
+        } 
+        else if (Object.tag == Tags.Enemy)
         {
             Type = CharacterTypes.Enemy;
         }

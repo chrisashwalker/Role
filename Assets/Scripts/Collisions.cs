@@ -12,6 +12,7 @@ public class Collisions : MonoBehaviour
         {
             Map.Player.Grounded = true;
         }
+        Control.GetKeyPress();
         CollidedObject = CollisionCheck(collision);
     }
 
@@ -25,7 +26,7 @@ public class Collisions : MonoBehaviour
     
     private GameObject CollisionCheck(Collision collision)
     {
-        if (collision.gameObject.tag == Tags.Bed && Input.GetKey(Control.Interact) && DateTime.Now >= Saves.LastSave.AddSeconds(3))
+        if (collision.gameObject.tag == Tags.Bed && Control.PressedKey == Control.Interact && DateTime.Now >= Saves.LastSave.AddSeconds(3))
         {
             Map.Player.Health = Map.Player.MaxHealth;
             Saves.GameState.GameDay += 1;
@@ -61,19 +62,19 @@ public class Collisions : MonoBehaviour
         }
         foreach (UnityCharacter character in Map.Characters)
         {
-            if (character.Collider == collision.collider && Input.GetKey(Control.Buy))
+            if (character.Collider == collision.collider && Control.PressedKey == Control.Buy)
             {
                 Trading.FindSaleItems(Map.Player, character);
                 return null;
             }
-            if (character.Collider == collision.collider && Input.GetKey(Control.Sell))
+            if (character.Collider == collision.collider && Control.PressedKey == Control.Sell)
             {
                 Trading.FindSaleItems(character, Map.Player);
                 return null;
             }
         }
         foreach (UnityGate gate in Map.Gates){
-            if (gate.Collider == collision.collider && Input.GetKey(Control.Interact))
+            if (gate.Collider == collision.collider && Control.PressedKey == Control.Interact)
             {
                 Saves.GameState.CurrentLocation = gate.Destination;
                 if (Saves.GameState.Progress < gate.Destination)
@@ -92,7 +93,7 @@ public class Collisions : MonoBehaviour
         }
         foreach (UnityMapItem mapItem in Map.MapItems)
         {
-            if (mapItem.Collider == collision.collider && Input.GetKey(Control.Interact) & Map.Player.Storage.StoredItems.Count < Map.Player.Storage.MaxCapacity)
+            if (mapItem.Collider == collision.collider && Control.PressedKey == Control.Interact & Map.Player.Storage.StoredItems.Count < Map.Player.Storage.MaxCapacity)
             {
                 Destroy(mapItem.Object);
                 Saves.GameState.AlteredObjects.Add(new AlteredObject("Removal", mapItem.Object.name, SceneManager.GetActiveScene(), mapItem.Object.transform.position, mapItem.Object.GetInstanceID()));

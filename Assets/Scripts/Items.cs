@@ -214,10 +214,10 @@ public class Items
     public static void ItemUseCheck()
     {
         int itemShift = 0;
-        if (Input.GetKeyDown(Control.ScrollLeft))
+        if (Control.PressedKey == Control.ScrollLeft)
         {
             itemShift = -1;
-        } else if (Input.GetKeyDown(Control.ScrollRight))
+        } else if (Control.PressedKey == Control.ScrollRight)
         {
             itemShift = 1;
         }
@@ -234,7 +234,7 @@ public class Items
             }
             UpdateToggles();
         }
-        if (Input.GetKeyDown(Control.UseItem))
+        if (Control.PressedKey == Control.UseItem)
         {
             if (Map.Player.Storage.StoredItems[Map.Player.Storage.EquippedItemIndex].Type.Equals(ItemTypes.PROJECTILE))
             {

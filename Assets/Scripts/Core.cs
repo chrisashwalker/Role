@@ -29,6 +29,7 @@ public class Core : MonoBehaviour
     public void Update()
     {
         Control.GetKeyPress();
+        Items.ItemUseCheck();
         Timeflow.Tick();
     }
 }

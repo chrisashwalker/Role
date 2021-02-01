@@ -1,8 +1,11 @@
+using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public static class Control
 {
+    public static KeyCode PressedKey {get; set;}
     public static KeyCode MapZoom {get;} = KeyCode.V;
     public static KeyCode Interact {get;} = KeyCode.E;
     public static KeyCode ScrollLeft {get;} = KeyCode.Comma;
@@ -50,17 +53,40 @@ public static class Control
 
     public static void GetKeyPress()
     {
-        if (Input.GetKeyDown(MapZoom))
+        List<KeyCode> keys = new List<KeyCode>();
+        keys.Add(MapZoom);
+        keys.Add(KeyCode.Alpha1);
+        keys.Add(KeyCode.Alpha2);
+        keys.Add(Interact);
+        keys.Add(ScrollLeft);
+        keys.Add(ScrollRight);
+        keys.Add(UseItem);
+        keys.Add(Buy);
+        keys.Add(Sell);
+
+        foreach (KeyCode key in keys)
+        {
+            if (Input.GetKeyDown(key))
+            {
+                PressedKey = key;
+                break;
+            }
+            else
+            {
+                PressedKey = KeyCode.Clear;
+            }
+        }
+
+        if (PressedKey == MapZoom)
         {
             UI.ToggleCamera();
-        } else if (Input.GetKeyDown(KeyCode.Alpha1))
+        } else if (PressedKey == KeyCode.Alpha1)
         {
             Map.FastTravel(1);
-        } else if (Input.GetKeyDown(KeyCode.Alpha2))
+        } else if (PressedKey == KeyCode.Alpha2)
         {
             Map.FastTravel(2);
         }
-        Items.ItemUseCheck();
     }
 
     public static void GetLayers()
@@ -131,14 +157,14 @@ public static class Control
                         Map.Player.Storage.StoredItems.Add(ItemList.Plant);
                     }
                 } 
-                else if (hitCollider.tag == Tags.Rock && UsedToolFunction.Equals(ToolFunctions.PICKAXE) && Input.GetKey(Control.UseItem))
+                else if (hitCollider.tag == Tags.Rock && UsedToolFunction.Equals(ToolFunctions.PICKAXE) && Control.PressedKey == Control.UseItem)
                 {
                     Saves.GameState.AlteredObjects.Add(new AlteredObject("Removal", hitCollider.gameObject.name, SceneManager.GetActiveScene(), hitCollider.gameObject.transform.position, hitCollider.gameObject.GetInstanceID()));
                     GameObject.Destroy(hitCollider);
                     Map.Rocks.Remove(hitCollider);
                     Map.Player.Storage.StoredItems.Add(ItemList.Stone);
                 } 
-                else if (hitCollider.tag == Tags.Tree && UsedToolFunction.Equals(ToolFunctions.AXE) && Input.GetKey(Control.UseItem))
+                else if (hitCollider.tag == Tags.Tree && UsedToolFunction.Equals(ToolFunctions.AXE) && Control.PressedKey == Control.UseItem)
                 {
                     Saves.GameState.AlteredObjects.Add(new AlteredObject("Removal", hitCollider.gameObject.name, SceneManager.GetActiveScene(), hitCollider.gameObject.transform.position, hitCollider.gameObject.GetInstanceID()));
                     GameObject.Destroy(hitCollider);
