@@ -1,24 +1,27 @@
 using UnityEngine;
 
-public enum CharacterTypes{
+public enum CharacterTypes
+{
     Player,
     NPC,
     Enemy
 }
 
-public abstract class Character{
-    public CharacterTypes Type{get;set;}
-    public string Name{get;set;}
-    public int MaxHealth{get;set;} 
-    public int MaxStamina{get;set;} 
-    public float Speed{get;set;}
-    public int Strength{get;set;} 
-    public int Health{get;set;} 
-    public int Stamina{get;set;}
-    public int Coins{get;set;}
-    public Inventory Storage{get;set;}
+public abstract class Character
+{
+    public CharacterTypes Type {get; set;}
+    public string Name {get; set;}
+    public int MaxHealth {get; set;} 
+    public int MaxStamina {get; set;} 
+    public float Speed {get; set;}
+    public int Strength {get; set;} 
+    public int Health {get; set;} 
+    public int Stamina {get; set;}
+    public int Coins {get; set;}
+    public Items Storage {get; set;}
     
-    public Character(CharacterTypes setType = CharacterTypes.NPC, string setName = "???", float setSpeed = 1.0f, int setMaxHealth = 10, int setMaxStamina = 1, int setStrength = 1, int setCoins = 10){
+    public Character(CharacterTypes setType = CharacterTypes.NPC, string setName = "???", float setSpeed = 1.0f, int setMaxHealth = 10, int setMaxStamina = 1, int setStrength = 1, int setCoins = 10)
+    {
         Type = setType;
         Name = setName;
         Speed = setSpeed;
@@ -28,30 +31,34 @@ public abstract class Character{
         Health = MaxHealth;
         Stamina = MaxStamina;
         Coins = setCoins;
-        Storage = new Inventory();
+        Storage = new Items();
     }
 }
 
-public class UnityCharacter : Character{
-    public GameObject Object{get;set;}
-    public Rigidbody Rigidbody{get;set;}
-    public Collider Collider{get;set;}
-    public int Identifier{get;set;}
-    public bool Grounded{get;set;}
-    public float LastShot{get;set;}
+public class UnityCharacter : Character
+{
+    public GameObject Object {get; set;}
+    public Rigidbody Rigidbody {get; set;}
+    public Collider Collider {get; set;}
+    public int Identifier {get; set;}
+    public bool Grounded {get; set;}
+    public float TimeOfLastAction {get; set;}
 
-    public UnityCharacter(GameObject go){
+    public UnityCharacter(GameObject go)
+    {
         Object = go;
         Name = Object.name;
         Rigidbody = Object.GetComponent<Rigidbody>();
         Collider = Object.GetComponent<Collider>();
         Identifier = Object.GetInstanceID();
-        if (Object.tag == "Player"){
+        if (Object.tag == Tags.Player)
+        {
             Type = CharacterTypes.Player;
-        } else if (Object.tag == "Enemy"){
+        } else if (Object.tag == Tags.Enemy)
+        {
             Type = CharacterTypes.Enemy;
         }
         Grounded = false;
-        LastShot = 0.0f;
+        TimeOfLastAction = 0.0f;
     }
 }

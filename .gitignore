@@ -13,3 +13,4 @@ Assets/*
 !Assets/Scripts/
 *.meta
 Models/
+!Assembly-CSharp.csproj
