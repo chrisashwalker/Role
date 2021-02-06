@@ -19,7 +19,6 @@ public static class Control
 
     public static void MoveCharacter(UnityCharacter character)
     {
-        float speed = 10.0f;
         Ray ray = UI.MainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
         LayerMask ground = LayerMask.GetMask(Tags.Ground); 
@@ -34,7 +33,7 @@ public static class Control
             }
             if (TargetPosition != Vector3.zero && (TargetPosition - character.Rigidbody.position).magnitude > 0.1)
             {
-                character.Rigidbody.velocity = (TargetPosition - character.Rigidbody.position).normalized * speed;
+                character.Rigidbody.velocity = (TargetPosition - character.Rigidbody.position).normalized * character.Speed;
                 Quaternion angle = Quaternion.LookRotation(character.Rigidbody.velocity);
                 character.Rigidbody.MoveRotation(angle);
                 character.Object.GetComponent<Animator>().SetBool(Tags.Moving, true);
@@ -186,8 +185,12 @@ public static class Control
             {
                 if (follower.TimeOfLastAction <= Saves.GameState.GameTime - 1)
                 {
-                    follower.TimeOfLastAction = Saves.GameState.GameTime;
-                    ShootProjectile(follower, ItemList.Bow);
+                    Projectile usedWeapon = (Projectile) follower.Storage.StoredItems.Find(x => x.Type == ItemTypes.PROJECTILE);
+                    if (usedWeapon != null && usedWeapon.Quantity > 0)
+                    {
+                        follower.TimeOfLastAction = Saves.GameState.GameTime;
+                        ShootProjectile(follower, usedWeapon);
+                    }
                 }
             }
         } else if ((leader.Rigidbody.position - follower.Rigidbody.position).magnitude < 2)
@@ -201,13 +204,13 @@ public static class Control
         }
     }
 
-    public static void ShootProjectile(UnityCharacter shooter, Item usedItem)
+    public static void ShootProjectile(UnityCharacter shooter, Projectile usedWeapon)
     {
-        UnityProjectile projectile = new UnityProjectile(usedItem.Identifier);
+        UnityProjectile projectile = new UnityProjectile(usedWeapon.Identifier);
         Map.ShotProjectiles.Add(projectile);
-        float speed = 10f;
         projectile.Origin = shooter.Rigidbody.position + shooter.Rigidbody.transform.forward;
         projectile.Rigidbody.transform.SetPositionAndRotation(projectile.Origin, shooter.Rigidbody.rotation);
-        projectile.Rigidbody.AddForce(projectile.Rigidbody.transform.forward * speed, ForceMode.Impulse);
+        projectile.Rigidbody.AddForce(projectile.Rigidbody.transform.forward * ProjectileSpeed, ForceMode.Impulse);
+        usedWeapon.Quantity -= 1;
     }
 }

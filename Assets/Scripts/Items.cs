@@ -238,7 +238,7 @@ public class Items
         {
             if (Map.Player.Storage.StoredItems[Map.Player.Storage.EquippedItemIndex].Type.Equals(ItemTypes.PROJECTILE))
             {
-                Control.ShootProjectile(Map.Player, Map.Player.Storage.StoredItems[Map.Player.Storage.EquippedItemIndex]);
+                Control.ShootProjectile(Map.Player, (Projectile) Map.Player.Storage.StoredItems[Map.Player.Storage.EquippedItemIndex]);
             } else if (Map.Player.Storage.StoredItems[Map.Player.Storage.EquippedItemIndex].Type.Equals(ItemTypes.TOOL))
             {
                 Control.UseTool(Collisions.CollidedObject);

@@ -20,7 +20,7 @@ public abstract class Character
     public int Coins {get; set;}
     public Items Storage {get; set;}
     
-    public Character(CharacterTypes setType = CharacterTypes.NPC, string setName = "???", float setSpeed = 1.0f, int setMaxHealth = 10, int setMaxStamina = 1, int setStrength = 1, int setCoins = 10)
+    public Character(CharacterTypes setType = CharacterTypes.NPC, string setName = "???", float setSpeed = 10.0f, int setMaxHealth = 10, int setMaxStamina = 1, int setStrength = 1, int setCoins = 10)
     {
         Type = setType;
         Name = setName;
@@ -58,6 +58,7 @@ public class UnityCharacter : Character
         else if (Object.tag == Tags.Enemy)
         {
             Type = CharacterTypes.Enemy;
+            Speed = 8.0f;
         }
         Grounded = false;
         TimeOfLastAction = 0.0f;
