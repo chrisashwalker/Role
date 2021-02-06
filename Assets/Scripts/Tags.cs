@@ -13,6 +13,7 @@ public static class Tags
     public static string Tree {get;} = "Tree";
     public static string Projectile {get;} = "Projectile";
     public static string Plant {get;} = "Plant";
+    public static string Crop {get;} = "Crop";
     public static string ShortcutToggle {get;} = "ShortcutToggle";
     public static string ShortcutCanvas {get;} = "ShortcutCanvas";
     public static string Health {get;} = "Health";

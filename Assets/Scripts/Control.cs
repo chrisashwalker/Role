@@ -93,6 +93,73 @@ public static class Control
         InteractiveLayer = LayerMask.GetMask(Tags.Interactable);
     }
 
+    public static void PrepareSoil(Vector3 targetPosition)
+    {
+        GameObject Soil = GameObject.Instantiate(Resources.Load<GameObject>(Tags.Soil));
+        Soil.transform.position = targetPosition;
+        Saves.GameState.AlteredObjects.Add(new AlteredObject("Addition", Soil.name, SceneManager.GetActiveScene(), Soil.transform.position, Soil.GetInstanceID()));
+
+    }
+
+    public static void PlantSeed(Tool UsedTool, GameObject hitCollider, Vector3 targetPosition)
+    {
+        Saves.GameState.AlteredObjects.Remove(Saves.GameState.AlteredObjects.Find(x => x.Identifier.Equals(hitCollider.GetInstanceID())));
+        GameObject.Destroy(hitCollider);
+        GameObject Plant = GameObject.Instantiate(Resources.Load<GameObject>("CarrotStart"));
+        Plant.transform.position = targetPosition;
+        Saves.GameState.AlteredObjects.Add(new AlteredObject("Addition", Plant.name, SceneManager.GetActiveScene(), Plant.transform.position, Plant.GetInstanceID()));
+        if (UsedTool.Durability > 1)
+        {
+            UsedTool.Durability -= 1;
+        } 
+        else 
+        {
+            Map.Player.Storage.StoredItems.Remove(UsedTool);
+            Map.Player.Storage.EquippedItemIndex = 0;
+        }
+    }
+
+    public static void Dig(GameObject hitCollider)
+    {
+        GameObject.Destroy(hitCollider);
+        Saves.GameState.AlteredObjects.Remove(Saves.GameState.AlteredObjects.Find(x => x.Identifier.Equals(hitCollider.GetInstanceID())));
+        if (hitCollider.tag == Tags.Crop && Map.Player.Storage.MaxCapacity >= Map.Player.Storage.StoredItems.Count + ItemList.Plant.Strength)
+        {
+            for (int i = 0; i < ItemList.Plant.Strength; i++)
+            {
+                Map.Player.Storage.StoredItems.Add(ItemList.Plant);
+            }
+        }
+        else
+        {
+            if (Map.Player.Storage.StoredItems.Contains(ItemList.Seed))
+            {
+                Tool collectedSeed = (Tool) Map.Player.Storage.StoredItems.Find(x => x.Equals(ItemList.Seed));
+                collectedSeed.Durability += 1;
+            } 
+            else 
+            {
+                Map.Player.Storage.StoredItems.Add(ItemList.Seed);
+            }
+        }
+    }
+
+    public static void BreakObject(GameObject hitCollider)
+    {
+        Saves.GameState.AlteredObjects.Add(new AlteredObject("Removal", hitCollider.gameObject.name, SceneManager.GetActiveScene(), hitCollider.gameObject.transform.position, hitCollider.gameObject.GetInstanceID()));
+        GameObject.Destroy(hitCollider);
+        if (hitCollider.tag == Tags.Rock)
+        {
+            Map.Rocks.Remove(hitCollider);
+            Map.Player.Storage.StoredItems.Add(ItemList.Stone);
+        }
+        else if (hitCollider.tag == Tags.Tree)
+        {
+            Map.Trees.Remove(hitCollider);
+            Map.Player.Storage.StoredItems.Add(ItemList.Wood);
+        }
+    }
+
     public static void UseTool(GameObject collidedObject)
     {
         Tool UsedTool = (Tool) Map.Player.Storage.StoredItems[Map.Player.Storage.EquippedItemIndex];
@@ -107,68 +174,24 @@ public static class Control
         {
             if (UsedToolFunction.Equals(ToolFunctions.WATER))
             {
-                GameObject Soil = GameObject.Instantiate(Resources.Load<GameObject>(Tags.Soil));
-                Soil.transform.position = UI.Target.transform.position;
-                Saves.GameState.AlteredObjects.Add(new AlteredObject("Addition", Soil.name, SceneManager.GetActiveScene(), Soil.transform.position, Soil.GetInstanceID()));
+                PrepareSoil(UI.Target.transform.position);
             }
         } 
         else 
         {
             if (UsedToolFunction.Equals(ToolFunctions.SEED) && hitCollider.tag == Tags.Soil)
             {
-                Saves.GameState.AlteredObjects.Remove(Saves.GameState.AlteredObjects.Find(x => x.Identifier.Equals(hitCollider.GetInstanceID())));
-                GameObject.Destroy(hitCollider);
-                GameObject Plant = GameObject.Instantiate(Resources.Load<GameObject>("CarrotStart"));
-                Plant.transform.position = UI.Target.transform.position;
-                Saves.GameState.AlteredObjects.Add(new AlteredObject("Addition", Plant.name, SceneManager.GetActiveScene(), Plant.transform.position, Plant.GetInstanceID()));
-                if (UsedTool.Durability > 1)
-                {
-                    UsedTool.Durability -= 1;
-                } 
-                else 
-                {
-                    Map.Player.Storage.StoredItems.Remove(UsedTool);
-                    Map.Player.Storage.EquippedItemIndex = 0;
-                }
+                PlantSeed(UsedTool, hitCollider, UI.Target.transform.position);
             } 
             else if (Map.Player.Storage.MaxCapacity > Map.Player.Storage.StoredItems.Count)
             {
-                if (UsedToolFunction.Equals(ToolFunctions.SHOVEL) && hitCollider.tag == Tags.Plant)
+                if (UsedToolFunction.Equals(ToolFunctions.SHOVEL) && hitCollider.tag == Tags.Plant || hitCollider.tag == Tags.Crop)
                 {
-                    GameObject.Destroy(hitCollider);
-                    Saves.GameState.AlteredObjects.Remove(Saves.GameState.AlteredObjects.Find(x => x.Identifier.Equals(hitCollider.GetInstanceID())));
-                    if (Map.Player.Storage.StoredItems.Contains(ItemList.Seed))
-                    {
-                        Tool collectedSeed = (Tool) Map.Player.Storage.StoredItems.Find(x => x.Equals(ItemList.Seed));
-                        collectedSeed.Durability += 1;
-                    } 
-                    else 
-                    {
-                        Map.Player.Storage.StoredItems.Add(ItemList.Seed);
-                    }
+                    Dig(hitCollider);
                 } 
-                else if (UsedToolFunction.Equals(ToolFunctions.SHOVEL) && Map.Player.Storage.MaxCapacity >= Map.Player.Storage.StoredItems.Count + ItemList.Plant.Strength  && hitCollider.tag == "Crop")
+                else if (UsedToolFunction.Equals(ToolFunctions.PICKAXE) && UsedToolFunction.Equals(ToolFunctions.AXE))
                 {
-                    GameObject.Destroy(hitCollider);
-                    Saves.GameState.AlteredObjects.Remove(Saves.GameState.AlteredObjects.Find(x => x.Identifier.Equals(hitCollider.GetInstanceID())));
-                    for (int i = 0; i < ItemList.Plant.Strength; i++)
-                    {
-                        Map.Player.Storage.StoredItems.Add(ItemList.Plant);
-                    }
-                } 
-                else if (hitCollider.tag == Tags.Rock && UsedToolFunction.Equals(ToolFunctions.PICKAXE) && Control.PressedKey == Control.UseItem)
-                {
-                    Saves.GameState.AlteredObjects.Add(new AlteredObject("Removal", hitCollider.gameObject.name, SceneManager.GetActiveScene(), hitCollider.gameObject.transform.position, hitCollider.gameObject.GetInstanceID()));
-                    GameObject.Destroy(hitCollider);
-                    Map.Rocks.Remove(hitCollider);
-                    Map.Player.Storage.StoredItems.Add(ItemList.Stone);
-                } 
-                else if (hitCollider.tag == Tags.Tree && UsedToolFunction.Equals(ToolFunctions.AXE) && Control.PressedKey == Control.UseItem)
-                {
-                    Saves.GameState.AlteredObjects.Add(new AlteredObject("Removal", hitCollider.gameObject.name, SceneManager.GetActiveScene(), hitCollider.gameObject.transform.position, hitCollider.gameObject.GetInstanceID()));
-                    GameObject.Destroy(hitCollider);
-                    Map.Trees.Remove(hitCollider);
-                    Map.Player.Storage.StoredItems.Add(ItemList.Wood);
+                    BreakObject(hitCollider);
                 }
             }
         }
